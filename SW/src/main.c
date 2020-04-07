@@ -2,22 +2,17 @@
 
 #include <stdint.h>
 #include "ClockDrv.h"
-#include "stm32f746xx.h"
-
+#include "ChipInfo.h"
 
 int main(void)
 {
 	ErrorStatus result = SUCCESS;
 	
+	/* Get chip informations */
+	ChipInfo_Get();
+
 	/* Clock initialization */
-	result &= ClockDrv_Init();
-	
-	
-	
-	// controllare RTC, get info dal chip
-	
-	
-	
+	result &= ClockDrv_Init();	
 	
 	
 	uint32_t x = 0;

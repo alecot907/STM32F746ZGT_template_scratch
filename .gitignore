@@ -11,3 +11,6 @@
 *.hex
 *.lnp
 *.dep
+SW/Objects/co-arm_template_scratch.h
+*.iex
+*.lnt

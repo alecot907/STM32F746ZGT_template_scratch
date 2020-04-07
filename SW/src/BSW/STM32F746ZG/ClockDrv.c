@@ -20,17 +20,17 @@
 #define RCC_PLLCFGR_PLLN_CFG				(72 << RCC_PLLCFGR_PLLN_Pos)
 #define RCC_PLLCFGR_PLLM_CFG			(RCC_PLLCFGR_PLLM_2)
 
-#define RCC_CFGR_PPRE2_CFG					(0 << RCC_CFGR_PPRE2_Pos)  /* AHB clock not divided */
-#define RCC_CFGR_PPRE1_CFG					(RCC_CFGR_PPRE1_2)  /* AHB clock divided by 2 */
+#define RCC_CFGR_PPRE2_CFG					(0 << RCC_CFGR_PPRE2_Pos) /* AHB clock not divided */
+#define RCC_CFGR_PPRE1_CFG					(RCC_CFGR_PPRE1_2)  			/* AHB clock divided by 2 */
 #define RCC_CFGR_HPRE_CFG						(0 << RCC_CFGR_HPRE_Pos)  /* system clock not divided */
-#define RCC_CFGR_SW_CFG							(RCC_CFGR_SW_1)  /* PLL selected as system clock */
+#define RCC_CFGR_SW_CFG							(RCC_CFGR_SW_1)  					/* PLL selected as system clock */
 
 #define RCC_DCKCFGR2_CK48MSEL_CFG (0 << RCC_DCKCFGR2_CK48MSEL_Pos)  /* 48MHz clock from PLL is selected */
 
 
-#define RCC_BDCR_RTCSEL_CFG		(RCC_BDCR_RTCSEL_0)  /* LSE oscillator clock used as the RTC clock */
-#define RCC_BDCR_LSEDRV_CFG  (RCC_BDCR_LSEDRV) /* High driving capability */
-#define RCC_BDCR_LSEBYP_CFG   (0 << RCC_BDCR_LSEBYP_Pos) /* LSE oscillator not bypassed */
+#define RCC_BDCR_RTCSEL_CFG		(RCC_BDCR_RTCSEL_0)  				/* LSE oscillator clock used as the RTC clock */
+#define RCC_BDCR_LSEDRV_CFG  	(RCC_BDCR_LSEDRV) 					/* High driving capability */
+#define RCC_BDCR_LSEBYP_CFG   (0 << RCC_BDCR_LSEBYP_Pos) 	/* LSE oscillator not bypassed */
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -46,6 +46,7 @@ volatile uint32_t sys_ticks = 0UL;
 /*SysTick_Init*/
 /**************************************************************************************/
 static ErrorStatus SysTick_Init (void);
+static ErrorStatus RTC_Init (void);
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -53,7 +54,7 @@ static ErrorStatus SysTick_Init (void);
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 /**************************************************************************************/
-/*SysTick_Init*/
+/* SysTick_Init */
 /**************************************************************************************/
 static ErrorStatus SysTick_Init (void)
 {
@@ -67,6 +68,22 @@ static ErrorStatus SysTick_Init (void)
 	return SUCCESS;
 }
 
+
+/**************************************************************************************/
+/* RTC_Init */
+/**************************************************************************************/
+static ErrorStatus RTC_Init (void)
+{
+	/* RTC clock configuration */
+//	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEDRV, RCC_BDCR_LSEDRV_CFG);
+//	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEBYP, RCC_BDCR_LSEBYP_CFG);
+//	SET_BIT(RCC->BDCR, RCC_BDCR_LSEON);
+//	while ( !READ_BIT(RCC->BDCR, RCC_BDCR_LSERDY) );
+//	MODIFY_REG(RCC->BDCR, RCC_BDCR_RTCSEL, RCC_BDCR_RTCSEL_CFG);
+//	SET_BIT(RCC->BDCR, RCC_BDCR_RTCEN);
+
+	return SUCCESS;
+}
 
 /**************************************************************************************/
 /* ClockDrv_Init */
@@ -160,17 +177,14 @@ ErrorStatus ClockDrv_Init(void)
 	{
 		return ERROR;
 	}
-			
+	
 	/* CLK48 clock seurce selection */
 	MODIFY_REG(RCC->DCKCFGR2, RCC_DCKCFGR2_CK48MSEL, RCC_DCKCFGR2_CK48MSEL_CFG);
 
-	/* RTC configuration */
-	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEDRV, RCC_BDCR_LSEDRV_CFG);
-	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEBYP, RCC_BDCR_LSEBYP_CFG);
-	SET_BIT(RCC->BDCR, RCC_BDCR_LSEON);
-	while ( !READ_BIT(RCC->BDCR, RCC_BDCR_LSERDY) );
-	MODIFY_REG(RCC->BDCR, RCC_BDCR_RTCSEL, RCC_BDCR_RTCSEL_CFG);
-	SET_BIT(RCC->BDCR, RCC_BDCR_RTCEN);
+	if ( ERROR == RTC_Init() )
+	{
+		return ERROR;
+	}
 	
 	return SUCCESS;
 }

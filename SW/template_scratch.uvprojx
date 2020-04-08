@@ -402,6 +402,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\BSW\STM32F746ZG\ChipInfo.c</FilePath>
             </File>
+            <File>
+              <FileName>RtcDrv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\BSW\STM32F746ZG\RtcDrv.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -8,29 +8,28 @@
 /* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #define SYS_TICK_PRIORITY					(0)
-#define SYS_TICK_SUBPRIORITY		(0)
+#define SYS_TICK_SUBPRIORITY			(0)
 
 /* User configurable parameters. Hint: to set these parameters, use the program STM32CubeMX */
 #define PWR_CR1_VOS_CFG						(PWR_CR1_VOS_0) /* 01: Scale 3 mode;  10: Scale 2 mode;  11: Scale 1 mode (reset value) */
-#define FLASH_ACR_LATENCY_CFG		(FLASH_ACR_LATENCY_2WS)  /* IMPORTANT!!!  See datasheet "Read access latency" to choose this parameter */
+#define FLASH_ACR_LATENCY_CFG			(FLASH_ACR_LATENCY_2WS)  /* IMPORTANT!!!  See datasheet "Read access latency" to choose this parameter */
 
 #define RCC_PLLCFGR_PLLSRC_CFG		(RCC_PLLCFGR_PLLSRC_HSE)
-#define RCC_PLLCFGR_PLLQ_CFG				(RCC_PLLCFGR_PLLQ_1 | RCC_PLLCFGR_PLLQ_0)
-#define RCC_PLLCFGR_PLLP_CFG				(0 << RCC_PLLCFGR_PLLP_Pos)
-#define RCC_PLLCFGR_PLLN_CFG				(72 << RCC_PLLCFGR_PLLN_Pos)
+#define RCC_PLLCFGR_PLLQ_CFG			(RCC_PLLCFGR_PLLQ_1 | RCC_PLLCFGR_PLLQ_0)
+#define RCC_PLLCFGR_PLLP_CFG			(0 << RCC_PLLCFGR_PLLP_Pos)
+#define RCC_PLLCFGR_PLLN_CFG			(72 << RCC_PLLCFGR_PLLN_Pos)
 #define RCC_PLLCFGR_PLLM_CFG			(RCC_PLLCFGR_PLLM_2)
 
-#define RCC_CFGR_PPRE2_CFG					(0 << RCC_CFGR_PPRE2_Pos) /* AHB clock not divided */
-#define RCC_CFGR_PPRE1_CFG					(RCC_CFGR_PPRE1_2)  			/* AHB clock divided by 2 */
-#define RCC_CFGR_HPRE_CFG						(0 << RCC_CFGR_HPRE_Pos)  /* system clock not divided */
-#define RCC_CFGR_SW_CFG							(RCC_CFGR_SW_1)  					/* PLL selected as system clock */
+#define RCC_CFGR_PPRE2_CFG				(0 << RCC_CFGR_PPRE2_Pos) /* AHB clock not divided */
+#define RCC_CFGR_PPRE1_CFG				(RCC_CFGR_PPRE1_2)  			/* AHB clock divided by 2 */
+#define RCC_CFGR_HPRE_CFG					(0 << RCC_CFGR_HPRE_Pos)  /* system clock not divided */
+#define RCC_CFGR_SW_CFG						(RCC_CFGR_SW_1)  					/* PLL selected as system clock */
 
 #define RCC_DCKCFGR2_CK48MSEL_CFG (0 << RCC_DCKCFGR2_CK48MSEL_Pos)  /* 48MHz clock from PLL is selected */
 
 
-#define RCC_BDCR_RTCSEL_CFG		(RCC_BDCR_RTCSEL_0)  				/* LSE oscillator clock used as the RTC clock */
-#define RCC_BDCR_LSEDRV_CFG  	(RCC_BDCR_LSEDRV) 					/* High driving capability */
-#define RCC_BDCR_LSEBYP_CFG   (0 << RCC_BDCR_LSEBYP_Pos) 	/* LSE oscillator not bypassed */
+#define RCC_BDCR_LSEDRV_CFG  			(0 << RCC_BDCR_LSEDRV_Pos) 	/* High driving capability */
+#define RCC_BDCR_LSEBYP_CFG   		(0 << RCC_BDCR_LSEBYP_Pos) 	/* LSE oscillator not bypassed */
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -46,7 +45,6 @@ volatile uint32_t sys_ticks = 0UL;
 /*SysTick_Init*/
 /**************************************************************************************/
 static ErrorStatus SysTick_Init (void);
-static ErrorStatus RTC_Init (void);
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -68,23 +66,6 @@ static ErrorStatus SysTick_Init (void)
 	return SUCCESS;
 }
 
-
-/**************************************************************************************/
-/* RTC_Init */
-/**************************************************************************************/
-static ErrorStatus RTC_Init (void)
-{
-	/* RTC clock configuration */
-//	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEDRV, RCC_BDCR_LSEDRV_CFG);
-//	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEBYP, RCC_BDCR_LSEBYP_CFG);
-//	SET_BIT(RCC->BDCR, RCC_BDCR_LSEON);
-//	while ( !READ_BIT(RCC->BDCR, RCC_BDCR_LSERDY) );
-//	MODIFY_REG(RCC->BDCR, RCC_BDCR_RTCSEL, RCC_BDCR_RTCSEL_CFG);
-//	SET_BIT(RCC->BDCR, RCC_BDCR_RTCEN);
-
-	return SUCCESS;
-}
-
 /**************************************************************************************/
 /* ClockDrv_Init */
 /**************************************************************************************/
@@ -103,7 +84,8 @@ ErrorStatus ClockDrv_Init(void)
 	SET_BIT(RCC->APB2ENR, RCC_APB2ENR_SYSCFGEN);
 	/* Enable access to RTC and backup registers */
   SET_BIT(PWR->CR1, PWR_CR1_DBP);
-	
+	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEDRV, RCC_BDCR_LSEDRV_CFG);
+
 	/* Select the Regulator voltage scaling */
 	MODIFY_REG(PWR->CR1, PWR_CR1_VOS, PWR_CR1_VOS_CFG);
 	/* Check if Regulator voltage scaling was correctly written */
@@ -117,6 +99,11 @@ ErrorStatus ClockDrv_Init(void)
 	SET_BIT(RCC->CR, RCC_CR_HSEON);
 	while( !READ_BIT(RCC->CR, RCC_CR_HSERDY) );
 		
+	/* LSE oscillator source clock selection, enable and wait for stabilization */
+	MODIFY_REG(RCC->BDCR, RCC_BDCR_LSEBYP, RCC_BDCR_LSEBYP_CFG);
+	SET_BIT(RCC->BDCR, RCC_BDCR_LSEON);
+	while ( !READ_BIT(RCC->BDCR, RCC_BDCR_LSERDY) );
+	
 	/* PLL disable and wait for PLL stabilization (this operation must be executed after HSE stabilization) */
 	CLEAR_BIT(RCC->CR, RCC_CR_PLLON);
 	while ( READ_BIT(RCC->CR, RCC_CR_PLLRDY) );	
@@ -131,7 +118,7 @@ ErrorStatus ClockDrv_Init(void)
 	/* PLL enable and wait for PLL stabilization (this operation must be executed after HSE stabilization) */
 	SET_BIT(RCC->CR, RCC_CR_PLLON);
 	while ( !READ_BIT(RCC->CR, RCC_CR_PLLRDY) );	
-	
+		
 	/* If to-be-set latency is more than already-set latency, set new latency (Increasing the CPU frequency)  */
 	if ( FLASH_ACR_LATENCY_CFG > (READ_BIT(FLASH->ACR, FLASH_ACR_LATENCY)) )
 	{
@@ -180,12 +167,7 @@ ErrorStatus ClockDrv_Init(void)
 	
 	/* CLK48 clock seurce selection */
 	MODIFY_REG(RCC->DCKCFGR2, RCC_DCKCFGR2_CK48MSEL, RCC_DCKCFGR2_CK48MSEL_CFG);
-
-	if ( ERROR == RTC_Init() )
-	{
-		return ERROR;
-	}
-	
+		
 	return SUCCESS;
 }
 

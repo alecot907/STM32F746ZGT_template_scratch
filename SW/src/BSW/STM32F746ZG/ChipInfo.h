@@ -1,5 +1,5 @@
-#ifndef __INFO_H
-#define __INFO_H
+#ifndef __CHIPINFO_H
+#define __CHIPINFO_H
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
@@ -38,4 +38,4 @@ void ChipInfo_Get (void);
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 extern ChipInfo_t ChipInfo;
 
-#endif /* __INFO_H */
+#endif /* __CHIPINFO_H */

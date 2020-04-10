@@ -4,7 +4,7 @@
  *      *** Do not modify ! ***
  *
  * Project: 'template_scratch' 
- * Target:  'template_scratch' 
+ * Target:  'STM32F746ZGT' 
  */
 
 #ifndef RTE_COMPONENTS_H
@@ -16,7 +16,7 @@
  */
 #define CMSIS_device_header "stm32f7xx.h"
 
-/*  Keil::Device:Startup:1.2.2 */
+/*  Keil::Device:Startup:1.2.4 */
 #define RTE_DEVICE_STARTUP_STM32F7XX    /* Device Startup for STM32F7 */
 
 

@@ -85,9 +85,14 @@ __Vectors       DCD     __initial_sp               ; Top of Stack
                 DCD     SVC_Handler                ; SVCall Handler
                 DCD     DebugMon_Handler           ; Debug Monitor Handler
                 DCD     0                          ; Reserved
-                DCD     PendSV_Handler             ; PendSV Handler
-                DCD     SysTick_Handler            ; SysTick Handler
-
+					IF	:DEF:OS_USE
+				DCD     OS_CPU_PendSVHandler   	   ; PendSV Handler
+				DCD     OS_CPU_SysTickHandler      ; SysTick Handler
+					ELSE
+				DCD     PendSV_Handler   	   		; PendSV Handler
+				DCD     SysTick_Handler      		; SysTick Handler
+					ENDIF
+					
                 ; External Interrupts
                 DCD     WWDG_IRQHandler                   ; Window WatchDog                                        
                 DCD     PVD_IRQHandler                    ; PVD through EXTI Line detection                        
@@ -240,17 +245,28 @@ DebugMon_Handler\
                 EXPORT  DebugMon_Handler           [WEAK]
                 B       .
                 ENDP
-PendSV_Handler  PROC
-                EXPORT  PendSV_Handler             [WEAK]
-                B       .
-                ENDP
-SysTick_Handler PROC
-                EXPORT  SysTick_Handler            [WEAK]
-                B       .
-                ENDP
+					IF	:DEF:OS_USE
+OS_CPU_PendSVHandler	PROC
+				EXPORT  OS_CPU_PendSVHandler             [WEAK]
+				B       .
+				ENDP
+OS_CPU_SysTickHandler	PROC
+				EXPORT  OS_CPU_SysTickHandler            [WEAK]
+				B       .
+				ENDP
+					ELSE
+PendSV_Handler	PROC
+				EXPORT  PendSV_Handler             [WEAK]
+				B       .
+				ENDP
+SysTick_Handler	PROC
+				EXPORT  SysTick_Handler            [WEAK]
+				B       .
+				ENDP
+					ENDIF
+
 
 Default_Handler PROC
-
                 EXPORT  WWDG_IRQHandler                   [WEAK]                                        
                 EXPORT  PVD_IRQHandler                    [WEAK]                      
                 EXPORT  TAMP_STAMP_IRQHandler             [WEAK]         

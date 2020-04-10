@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>template_scratch</TargetName>
+      <TargetName>STM32F746ZGT</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32F746ZGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F7xx_DFP.2.11.0</PackID>
-          <PackURL>http://www.keil.com/pack</PackURL>
+          <PackID>Keil.STM32F7xx_DFP.2.12.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20010000,0x40000) IRAM2(0x20000000,0x10000) IROM(0x08000000,0x100000) IROM2(0x00200000,0x100000) CPUTYPE("Cortex-M7") FPU3(SFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -336,9 +336,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F746xx</Define>
+              <Define>STM32F746xx, OS_USE_NO</Define>
               <Undefine></Undefine>
-              <IncludePath>.\src\BSW\STM32F746ZG;.\src\BSW;.\src\BSW_CFG\STM32F746ZG;.\src\BSW_CFG;.\src</IncludePath>
+              <IncludePath>.\src\BSW\STM32F746ZG;.\src\BSW;.\src\BSW_CFG\STM32F746ZG;.\src\BSW_CFG;.\src;.\src\OS</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -354,7 +354,7 @@
             <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define></Define>
+              <Define>OS_USE_NO</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
@@ -413,10 +413,33 @@
           <GroupName>BSW_CFG</GroupName>
         </Group>
         <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>cpu_a.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\OS\cpu_a.asm</FilePath>
+            </File>
+            <File>
+              <FileName>os_cpu_a.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\OS\os_cpu_a.asm</FilePath>
+            </File>
+            <File>
+              <FileName>os_cpu_c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\OS\os_cpu_c.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
           <GroupName>::Device</GroupName>
+        </Group>
+        <Group>
+          <GroupName>::RTOS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -425,34 +448,78 @@
   <RTE>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.2.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.5.1"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.3.0" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.6.0"/>
         <targetInfos>
-          <targetInfo name="template_scratch"/>
+          <targetInfo name="STM32F746ZGT"/>
         </targetInfos>
       </component>
-      <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.2.2" condition="STM32F7 CMSIS">
-        <package name="STM32F7xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.11.0"/>
+      <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.2.4" condition="STM32F7 CMSIS">
+        <package name="STM32F7xx_DFP" schemaVersion="1.6.0" url="https://www.keil.com/pack/" vendor="Keil" version="2.12.0"/>
         <targetInfos>
-          <targetInfo name="template_scratch"/>
+          <targetInfo name="STM32F746ZGT"/>
+        </targetInfos>
+      </component>
+      <component Cbundle="Micrium" Cclass="RTOS" Cgroup="uC/OS Common" Cvendor="Micrium" Cversion="1.0.0" condition="CM">
+        <package license="Docs\license.txt" name="RTOS" schemaVersion="1.2" supportContact="http://www.micrium.com" url="http://www.micrium.com/cmsis-pack/" vendor="Micrium" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="STM32F746ZGT"/>
+        </targetInfos>
+      </component>
+      <component Cbundle="Micrium" Cclass="RTOS" Cgroup="uC/OS Kernel" Cvariant="uCOS-II" Cvendor="Micrium" Cversion="1.0.0" condition="CM">
+        <package license="Docs\license.txt" name="RTOS" schemaVersion="1.2" supportContact="http://www.micrium.com" url="http://www.micrium.com/cmsis-pack/" vendor="Micrium" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="STM32F746ZGT"/>
         </targetInfos>
       </component>
     </components>
     <files>
       <file attr="config" category="source" condition="STM32F746_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f746xx.s" version="1.2.2">
         <instance index="0">RTE\Device\STM32F746ZGTx\startup_stm32f746xx.s</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.2.2" condition="STM32F7 CMSIS"/>
-        <package name="STM32F7xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.11.0"/>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.2.4" condition="STM32F7 CMSIS"/>
+        <package name="STM32F7xx_DFP" schemaVersion="1.6.0" url="https://www.keil.com/pack/" vendor="Keil" version="2.12.0"/>
         <targetInfos>
-          <targetInfo name="template_scratch"/>
+          <targetInfo name="STM32F746ZGT"/>
         </targetInfos>
       </file>
       <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c" version="1.2.2">
         <instance index="0">RTE\Device\STM32F746ZGTx\system_stm32f7xx.c</instance>
-        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.2.2" condition="STM32F7 CMSIS"/>
-        <package name="STM32F7xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.11.0"/>
+        <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.2.4" condition="STM32F7 CMSIS"/>
+        <package name="STM32F7xx_DFP" schemaVersion="1.6.0" url="https://www.keil.com/pack/" vendor="Keil" version="2.12.0"/>
         <targetInfos>
-          <targetInfo name="template_scratch"/>
+          <targetInfo name="STM32F746ZGT"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="cfg\app_cfg.h" version="1.0.0">
+        <instance index="0">RTE\RTOS\app_cfg.h</instance>
+        <component Cbundle="Micrium" Cclass="RTOS" Cgroup="uC/OS Kernel" Cvariant="uCOS-II" Cvendor="Micrium" Cversion="1.0.0" condition="CM"/>
+        <package license="Docs\license.txt" name="RTOS" schemaVersion="1.2" supportContact="http://www.micrium.com" url="http://www.micrium.com/cmsis-pack/" vendor="Micrium" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="STM32F746ZGT"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="cfg\cpu_cfg.h" version="1.0.0">
+        <instance index="0">RTE\RTOS\cpu_cfg.h</instance>
+        <component Cbundle="Micrium" Cclass="RTOS" Cgroup="uC/OS Common" Cvendor="Micrium" Cversion="1.0.0" condition="CM"/>
+        <package license="Docs\license.txt" name="RTOS" schemaVersion="1.2" supportContact="http://www.micrium.com" url="http://www.micrium.com/cmsis-pack/" vendor="Micrium" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="STM32F746ZGT"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="cfg\lib_cfg.h" version="1.0.0">
+        <instance index="0">RTE\RTOS\lib_cfg.h</instance>
+        <component Cbundle="Micrium" Cclass="RTOS" Cgroup="uC/OS Common" Cvendor="Micrium" Cversion="1.0.0" condition="CM"/>
+        <package license="Docs\license.txt" name="RTOS" schemaVersion="1.2" supportContact="http://www.micrium.com" url="http://www.micrium.com/cmsis-pack/" vendor="Micrium" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="STM32F746ZGT"/>
+        </targetInfos>
+      </file>
+      <file attr="config" category="header" name="cfg\uCOS-II\os_cfg.h" version="1.0.0">
+        <instance index="0">RTE\RTOS\os_cfg.h</instance>
+        <component Cbundle="Micrium" Cclass="RTOS" Cgroup="uC/OS Kernel" Cvariant="uCOS-II" Cvendor="Micrium" Cversion="1.0.0" condition="CM"/>
+        <package license="Docs\license.txt" name="RTOS" schemaVersion="1.2" supportContact="http://www.micrium.com" url="http://www.micrium.com/cmsis-pack/" vendor="Micrium" version="1.0.0"/>
+        <targetInfos>
+          <targetInfo name="STM32F746ZGT"/>
         </targetInfos>
       </file>
     </files>

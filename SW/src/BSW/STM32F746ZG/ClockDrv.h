@@ -12,8 +12,11 @@
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 ErrorStatus ClockDrv_Init(void);
 
+#ifndef OS_USE
 void SysTick_Handler(void);
+#endif
 
+ErrorStatus SysTick_Init (void);
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* EXTERN VARIABLES */

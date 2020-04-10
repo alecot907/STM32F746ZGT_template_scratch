@@ -1,9 +1,11 @@
 #include "main.h"
+#include "os.h"
 
 #include <stdint.h>
 #include "ChipInfo.h"
 #include "ClockDrv.h"
 #include "RtcDrv.h"
+
 
 int main(void)
 {
@@ -14,23 +16,21 @@ int main(void)
 	
 	/* Clock initialization */
 	result &= ClockDrv_Init();	
-	
+
 	/* Rtc initialization */
 	RTC_Init();
+
+	/* Tick init */
+	result &= SysTick_Init();
 	
 	
-	uint32_t x = 0;
 	while(1)
 	{
-		x++;
 	}
 	
 	return 0;
 }
 
-
-	
-	
 	
 	/* NEXT STEPS: 
 	- GPIO init

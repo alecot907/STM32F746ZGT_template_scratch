@@ -1,102 +1,69 @@
-#ifndef __RTCDRV_H
-#define __RTCDRV_H
+#ifndef __USARTDRV_H
+#define __USARTDRV_H
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #include "stm32f7xx.h"
 
-
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-/* TYPE definition */
+/* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-typedef enum 
-{
-	FORBIDDEN = 0x0,
-	MONDAY,
-	TUESDAY,
-	WEDNESDAY,
-	THURSDAY,
-	FRIDAY,
-	SATURDAY,
-	SUNDAY
-} RTC_DayOfWeek_t;
-typedef struct 
-{
-	uint8_t 						Year;
-	uint8_t 						Month;
-	uint8_t 						Day;
-	RTC_DayOfWeek_t			DayOfWeek;
-	uint8_t 						Hour;
-	uint8_t 						Minute;
-	uint8_t 						Second;
-} RTC_Time_t;
+#define USART_BAUD_9600			(9600)
+#define USART_BAUD_19200		(19200)
+#define USART_BAUD_38400		(38400)
+#define USART_BAUD_57600		(57600)
+#define USART_BAUD_115200		(115200)
+#define USART_BAUD_230400		(230400)
+#define USART_BAUD_460800		(460800)
+#define USART_BAUD_921600		(921600)
+#define USART_BAUD_13500000	(13500000)
+#define USART_BAUD_27000000	(27000000)
 
-
-typedef struct 
-{
-	uint8_t 	DayOrDate;
-	uint8_t 	DayOrDateSelection; // 0: date units; 	1: the week day.
-	uint8_t 	Hour;
-	uint8_t 	Minute;
-	uint8_t 	Second;
-}RTC_AlarmTimeMask_t;
-typedef struct 
-{
-	uint8_t 	DayOrDate;
-	uint8_t 	Hour;
-	uint8_t 	Minute;
-	uint8_t 	Second;
-}RTC_AlarmTimeValue_t;
-typedef struct 
-{
-	RTC_AlarmTimeMask_t 	Mask;
-	RTC_AlarmTimeValue_t 	Value;
-} RTC_AlarmTime_t;
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PUBLIC FUNCTIONS */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 /**************************************************************************************/
-/* RTC_Init */
+/* GpioUsart_Init */
 /**************************************************************************************/
-void RTC_Init (void);
-/**************************************************************************************/
-/* RTC_SettTime */
-/**************************************************************************************/
-void RTC_SetTime (RTC_Time_t *time);
-/**************************************************************************************/
-/* RTC_GetTime */
-/**************************************************************************************/
-void RTC_GetTime (RTC_Time_t *time);
+void UsartDrv_GpioInit(void);
 
 /**************************************************************************************/
-/* RtcDrv_AlarmInt */
+/* UsartDrv_Init */
 /**************************************************************************************/
-void RtcDrv_AlarmInt (void);
-/**************************************************************************************/
-/* RTC_AlarmConfigure */
-/**************************************************************************************/
-void RTC_AlarmConfigure (RTC_AlarmTime_t *alarmtime);
-/**************************************************************************************/
-/* RTC_AlarmEnable */
-/**************************************************************************************/
-void RTC_AlarmEnable (void);
-/**************************************************************************************/
-/* RTC_AlarmDisable */
-/**************************************************************************************/
-void RTC_AlarmDisable (void);
+ErrorStatus UsartDrv_Init (uint32_t BaudRate);
 
 /**************************************************************************************/
-/* RTC_Alarm_IRQHandler */
+/* UsartDrv_Int */
 /**************************************************************************************/
-void RTC_Alarm_IRQHandler (void);
+void UsartDrv_Int (void);
+
+/**************************************************************************************/
+/* Usart2data_TXpoll */
+/**************************************************************************************/
+ErrorStatus Usart2data_TXpoll (uint8_t *data, uint32_t size);
+
+/**************************************************************************************/
+/* Usart2string_TXpoll */
+/**************************************************************************************/
+ErrorStatus Usart2string_TXpoll (const char *s, ...);
+
+/**************************************************************************************/
+/* Usart2string_RXpoll */
+/**************************************************************************************/
+ErrorStatus Usart2string_RXpoll (uint8_t *data, uint32_t size);
+
+/**************************************************************************************/
+/* USART2_IRQHandler */
+/**************************************************************************************/
+void USART2_IRQHandler (void);
+
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* EXTERN VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-extern RTC_Time_t 			RTC_Time;
-extern RTC_AlarmTime_t 	RTC_AlarmTime;
 
-#endif /* __RTCDRV_H */
+
+#endif /* __USARTDRV_H */

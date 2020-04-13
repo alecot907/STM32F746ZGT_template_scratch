@@ -20,8 +20,6 @@
 #define RCC_PLLCFGR_PLLN_CFG			(72 << RCC_PLLCFGR_PLLN_Pos)
 #define RCC_PLLCFGR_PLLM_CFG			(RCC_PLLCFGR_PLLM_2)
 
-#define RCC_CFGR_PPRE2_CFG				(0 << RCC_CFGR_PPRE2_Pos) /* AHB clock not divided */
-#define RCC_CFGR_PPRE1_CFG				(RCC_CFGR_PPRE1_2)  			/* AHB clock divided by 2 */
 #define RCC_CFGR_HPRE_CFG					(0 << RCC_CFGR_HPRE_Pos)  /* system clock not divided */
 #define RCC_CFGR_SW_CFG						(RCC_CFGR_SW_1)  					/* PLL selected as system clock */
 
@@ -68,7 +66,7 @@ ErrorStatus SysTick_Init (void)
 /**************************************************************************************/
 ErrorStatus ClockDrv_Init(void)
 {	
-  NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), SYS_TICK_PRIORITY, SYS_TICK_SUBPRIORITY));
+//	ClockDrv_SystickInt();
 	
 	if ( ERROR == SysTick_Init() )
 	{
@@ -92,8 +90,7 @@ ErrorStatus ClockDrv_Init(void)
 	}	
 	
 	/* HSE oscillator source clock selection, enable and wait for stabilization */
-	SET_BIT(RCC->CR, RCC_CR_HSEBYP);  // this setting could be parametrical
-	SET_BIT(RCC->CR, RCC_CR_HSEON);
+	SET_BIT(RCC->CR, (RCC_CR_HSEBYP | RCC_CR_HSEON));
 	while( !READ_BIT(RCC->CR, RCC_CR_HSERDY) );
 		
 	/* LSE oscillator source clock selection, enable and wait for stabilization */
@@ -170,11 +167,31 @@ ErrorStatus ClockDrv_Init(void)
 
 
 /**************************************************************************************/
+/* ClockDrv_SystickInt */
+/**************************************************************************************/
+void ClockDrv_SystickInt(void)
+{
+  NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), SYS_TICK_PRIORITY, SYS_TICK_SUBPRIORITY));
+}
+
+/**************************************************************************************/
 /* SysTick_Handler */
 /**************************************************************************************/
 #ifndef OS_USE
 void SysTick_Handler(void)
 {
 	sys_ticks++;
+}
+
+/**************************************************************************************/
+/* Delay_ms */
+/**************************************************************************************/
+void Delay_ms (uint32_t	delay_ms)
+{
+	uint32_t TimeInit;
+	
+	TimeInit = sys_ticks;
+	
+	while( (sys_ticks - TimeInit) < delay_ms);
 }
 #endif

@@ -2,6 +2,7 @@
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #include "RtcDrv.h"
+#include "GpioDrv.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -26,7 +27,6 @@ RTC_Time_t RTC_Time = {00, 01, 01, SATURDAY,
 RTC_AlarmTime_t RTC_AlarmTime = {{0, 0, 0, 		 0, 	0},
 																 {01, 	21, 	00,  10}}; // day, hour, min, sec
 	
-
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PRIVATE FUNCTIONS PROTOTYPES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -50,11 +50,6 @@ static void RTC_ProtectionEnable(void);
 /* RTC_ProtectionDisable */
 /**************************************************************************************/
 static void RTC_ProtectionDisable(void);
-
-/**************************************************************************************/
-/* RTC_AlarmConfigure */
-/**************************************************************************************/
-static void RTC_AlarmInit (void);
 
 												
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -81,8 +76,6 @@ void RTC_Init (void)
 		RTC_SetTime(&RTC_Time);
 	}
 	
-	RTC_AlarmInit();
-
 	RTC_GetTime(&RTC_Time);	
 }
 
@@ -176,9 +169,9 @@ void RTC_GetTime (RTC_Time_t *time)
 }
 
 /**************************************************************************************/
-/* RTC_AlarmConfigure */
+/* RtcDrv_AlarmInt */
 /**************************************************************************************/
-static void RTC_AlarmInit (void)
+void RtcDrv_AlarmInt (void)
 {
 	/* Enable RTC alarm interrupt */
 	/*Configure and enable the EXTI line corresponding to the RTC Alarm event in interrupt
@@ -187,7 +180,7 @@ static void RTC_AlarmInit (void)
 	SET_BIT(EXTI->RTSR, EXTI_RTSR_TR17);
 	
 	/* Configure and enable the RTC_ALARM IRQ channel in the NVIC. */
-	NVIC_SetPriority (RTC_Alarm_IRQn, (7UL << __NVIC_PRIO_BITS) - 1UL); /* set Priority for Systick Interrupt */
+	NVIC_SetPriority (RTC_Alarm_IRQn, (7UL << __NVIC_PRIO_BITS) - 1UL);
 	NVIC_EnableIRQ(RTC_Alarm_IRQn);
 }
 
@@ -323,7 +316,8 @@ void RTC_Alarm_IRQHandler (void)
 	if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
 	{
 	/* Clear alarm flag */
-		CLEAR_BIT(RTC->ISR, RTC_ISR_ALRAF);
+//		CLEAR_BIT(RTC->ISR, RTC_ISR_ALRAF);
+//		GpioDrv_SetPin(LED_RED_PORT, LED_RED_PIN, GPIO_LOW);
 	}
 }
 

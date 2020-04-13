@@ -407,10 +407,22 @@
               <FileType>1</FileType>
               <FilePath>.\src\BSW\STM32F746ZG\RtcDrv.c</FilePath>
             </File>
+            <File>
+              <FileName>GpioDrv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\BSW\STM32F746ZG\GpioDrv.c</FilePath>
+            </File>
+            <File>
+              <FileName>UsartDrv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\BSW\STM32F746ZG\UsartDrv.c</FilePath>
+            </File>
+            <File>
+              <FileName>InterruptDrv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\BSW\STM32F746ZG\InterruptDrv.c</FilePath>
+            </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>BSW_CFG</GroupName>
         </Group>
         <Group>
           <GroupName>OS</GroupName>

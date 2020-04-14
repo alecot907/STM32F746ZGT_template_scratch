@@ -422,6 +422,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\BSW\STM32F746ZG\InterruptDrv.c</FilePath>
             </File>
+            <File>
+              <FileName>LCDacm1602b.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\BSW\LCDacm1602b.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

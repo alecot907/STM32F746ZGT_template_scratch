@@ -43,7 +43,7 @@ void UsartDrv_Int (void);
 /**************************************************************************************/
 /* Usart2data_TXpoll */
 /**************************************************************************************/
-ErrorStatus Usart2data_TXpoll (uint8_t *data, uint32_t size);
+ErrorStatus Usart2data_TXpoll (const uint8_t *data, const uint32_t size);
 
 /**************************************************************************************/
 /* Usart2string_TXpoll */
@@ -53,7 +53,12 @@ ErrorStatus Usart2string_TXpoll (const char *s, ...);
 /**************************************************************************************/
 /* Usart2string_RXpoll */
 /**************************************************************************************/
-ErrorStatus Usart2string_RXpoll (uint8_t *data, uint32_t size);
+void Usart2string_RXpoll (uint8_t *data, uint32_t size);
+
+/**************************************************************************************/
+/* Usart2data_TXint */
+/**************************************************************************************/
+ErrorStatus Usart2data_TXint (const uint8_t *data, const uint32_t size);
 
 /**************************************************************************************/
 /* USART2_IRQHandler */

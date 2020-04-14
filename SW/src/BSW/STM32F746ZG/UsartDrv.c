@@ -9,6 +9,7 @@
 #include "ClockDrv.h"
 #include "GpioDrv.h"
 
+
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -49,12 +50,31 @@
 #define MAX_BYTE_TXBUFF							(128U)  // maximum bytes to TX in the buffers
 #define MAX_BYTE_RXBUFF							(128U)  // maximum bytes to RX in the buffers
 
+
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+/* TYPE definition */
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+
+typedef struct 
+{
+	uint8_t rx_buff[MAX_BYTE_RXBUFF];
+	
+	uint8_t tx_buff[MAX_BYTE_TXBUFF];
+	uint8_t tx_CurrIdx;  	// current index inside the buffer
+	uint8_t tx_StartIdx;	// Initial index inside the buffer
+	uint8_t tx_EndIdx;		// Final index inside the buffer
+} Usart2_t;
+
+
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-static char tx_buff[MAX_BYTE_TXBUFF];
-static char rx_buff[MAX_BYTE_RXBUFF];
 
+static Usart2_t Usart2Obj = { {0},
+															{0},
+															0,
+															0,
+															MAX_BYTE_TXBUFF-1};
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PRIVATE FUNCTIONS PROTOTYPES */
@@ -143,10 +163,7 @@ ErrorStatus UsartDrv_Init (uint32_t BaudRate)
 /* UsartDrv_Int */
 /**************************************************************************************/
 void UsartDrv_Int (void)
-{
-	/* Read data */
-	USART2->RDR;
-		
+{		
 	/* EXTI RX interrupt enable */
 	SET_BIT(EXTI->IMR, EXTI_IMR_IM6);
 	SET_BIT(EXTI->RTSR, EXTI_RTSR_TR6);
@@ -246,25 +263,23 @@ static ErrorStatus UsartBaudCalc(uint32_t BaudRate, uint32_t *BaudReg)
 /**************************************************************************************/
 /* Usart2data_TXpoll */
 /**************************************************************************************/
-ErrorStatus Usart2data_TXpoll (uint8_t *data, uint32_t size)
+ErrorStatus Usart2data_TXpoll (const uint8_t *data, const uint32_t size)
 {	
-	if ( (data == NULL) || (size == 0))
+	if ( (data == NULL) || (size == 0) || (size > MAX_BYTE_TXBUFF))
 	{
 		return ERROR;
 	}
 	else
 	{
 		uint32_t size_cnt = 0;
-		uint8_t *data_ptr = NULL;
 
-		data_ptr = data;
 		/* Transmit all data */
 		while (size_cnt < size)
 		{
 			/* Wait until TX register is empty (ready to be written) */
 			while (!READ_BIT(USART2->ISR, USART_ISR_TXE));
-			USART2->TDR = (*data_ptr) & 0xFF;
-			data_ptr++;
+			USART2->TDR = (*data) & 0xFF;
+			data++;
 			size_cnt++;
 		}
 			/* Wait until transfer is complete (TX shadow register empty) */
@@ -285,16 +300,16 @@ ErrorStatus Usart2string_TXpoll (const char *str, ...)
 	}
 	else
 	{
-		char *data_ptr = NULL;
+		uint8_t *data_ptr = NULL;
 		/* Create a ponter to the not declared parameters of the function */
 		static va_list arg;
 		/* Initialize arg so that it points to the area immediatly after the last parameter (&str += 4) */
 		va_start(arg, str);
 		/* compose the total string of str + additional arguments inside dbg_tx_buff */
-		vsprintf(tx_buff, str, arg);
+		vsprintf((char *) Usart2Obj.tx_buff, str, arg);
 		/* Release arg */
 		va_end(arg);
-		data_ptr = tx_buff;
+		data_ptr = Usart2Obj.tx_buff;
 		
 			/* Transmit all data */
 		while (*data_ptr != '\0')
@@ -314,14 +329,61 @@ ErrorStatus Usart2string_TXpoll (const char *str, ...)
 /**************************************************************************************/
 /* Usart2string_RXpoll */
 /**************************************************************************************/
-ErrorStatus Usart2string_RXpoll (uint8_t *data, uint32_t size)
+void Usart2string_RXpoll (uint8_t *data, uint32_t size)
 {
 	/* Used in polling */
-	uint8_t *data_ptr = data;
 	
 	if (READ_BIT(USART2->ISR, USART_ISR_RXNE))
 	{
-		*data_ptr = (uint8_t) (USART2->RDR & USART2_RXMASK);
+		*data = (uint8_t) (USART2->RDR & USART2_RXMASK);
+	}
+}
+
+
+
+/**************************************************************************************/
+/* Usart2data_TXint */
+/**************************************************************************************/
+ErrorStatus Usart2data_TXint (const uint8_t *data, const uint32_t size)
+{
+	/* Send first byte manually, then interrupt sends the rest */
+	if ( (data == NULL) || (size == 0) || (size > MAX_BYTE_TXBUFF))
+	{
+		return ERROR;
+	}
+	else
+	{
+		uint8_t tx_TempIdx;
+		uint8_t sizetemp = size;
+		if (sizetemp > MAX_BYTE_TXBUFF)
+		{
+			sizetemp = MAX_BYTE_TXBUFF;
+		}
+		
+		/* Prepare new data to be sent appending them to the previous ones */
+		Usart2Obj.tx_StartIdx = (Usart2Obj.tx_EndIdx + 1) % MAX_BYTE_TXBUFF;
+		tx_TempIdx = Usart2Obj.tx_StartIdx;
+		/* Copy new TX data inside TX buffer */
+		for (uint8_t i = 0; i < sizetemp; i++)
+		{
+			Usart2Obj.tx_buff[tx_TempIdx] = *(data + i);
+			tx_TempIdx = (tx_TempIdx + 1) % MAX_BYTE_TXBUFF;
+			/* If OVERRUN detected, stop filling the buffer (remaining data are not transmitted) */
+			if ((tx_TempIdx < Usart2Obj.tx_StartIdx) && (tx_TempIdx >= Usart2Obj.tx_CurrIdx))
+			{
+				sizetemp = i;
+			}
+		}
+		Usart2Obj.tx_EndIdx = (sizetemp + Usart2Obj.tx_EndIdx) % MAX_BYTE_TXBUFF;
+		
+		/* If TX interrupt is disabled, enable it and send first byte */
+		if (!READ_BIT(USART2->CR1, USART_CR1_TXEIE))
+		{
+			Usart2Obj.tx_CurrIdx = Usart2Obj.tx_StartIdx;
+			CLEAR_BIT(USART2->CR1, USART_CR1_TXEIE);
+			Usart2data_TXpoll(&Usart2Obj.tx_buff[Usart2Obj.tx_StartIdx], 1);
+			SET_BIT(USART2->CR1, USART_CR1_TXEIE);
+		}
 	}
 	
 	return SUCCESS;
@@ -333,11 +395,9 @@ ErrorStatus Usart2string_RXpoll (uint8_t *data, uint32_t size)
 /**************************************************************************************/
 void USART2_IRQHandler (void)
 {
-	/* Used in interrupt */
-
 	if (READ_BIT(USART2->ISR, USART_ISR_RXNE))
 	{
-		rx_buff[0] = (uint8_t) (USART2->RDR & USART2_RXMASK);
+		Usart2Obj.rx_buff[0] = (uint8_t) (USART2->RDR & USART2_RXMASK);
 		
 //		/* TEST */
 //		static GPIO_STATE led = GPIO_LOW;
@@ -346,6 +406,23 @@ void USART2_IRQHandler (void)
 //		Usart2string_TXpoll("\nHo ricevuto: %d", data_rx);
 //		static uint32_t rx_test;
 //		rx_test++;
+	}
+	
+	if (READ_BIT(USART2->ISR, USART_ISR_TXE))
+	{
+		/* If last byte was transmitted, stop communication */
+		if (Usart2Obj.tx_CurrIdx == Usart2Obj.tx_EndIdx)
+		{
+			CLEAR_BIT(USART2->CR1, USART_CR1_TXEIE);
+			SET_BIT(USART2->ICR, USART_ICR_TCCF);
+		}
+		else
+		{
+			/* If there are still data to be trnsmitted, send them. Note: 
+			the first byte was transmitted by the user */
+			Usart2Obj.tx_CurrIdx = (Usart2Obj.tx_CurrIdx + 1) % MAX_BYTE_TXBUFF;
+			USART2->TDR = Usart2Obj.tx_buff[Usart2Obj.tx_CurrIdx] & 0xFF;
+		}
 	}
 }
 

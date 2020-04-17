@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F746xx, OS_USE_NO</Define>
               <Undefine></Undefine>
-              <IncludePath>.\src\BSW\STM32F746ZG;.\src\BSW;.\src\BSW_CFG\STM32F746ZG;.\src\BSW_CFG;.\src;.\src\OS</IncludePath>
+              <IncludePath>.\src;.\src\OS;.\src\DRV\STM32F746ZG;.\src\DRV;.\src\DRV_CFG\STM32F746ZG;.\src\DRV_CFG</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -387,45 +387,85 @@
               <FileType>1</FileType>
               <FilePath>.\src\main.c</FilePath>
             </File>
+            <File>
+              <FileName>SysData.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\SysData.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\Usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>Rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\Rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>AcquireInput.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\AcquireInput.c</FilePath>
+            </File>
+            <File>
+              <FileName>LCDACM1602B.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\LCDACM1602B.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>BSW</GroupName>
+          <GroupName>DRV</GroupName>
           <Files>
-            <File>
-              <FileName>ClockDrv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\BSW\STM32F746ZG\ClockDrv.c</FilePath>
-            </File>
             <File>
               <FileName>ChipInfo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\BSW\STM32F746ZG\ChipInfo.c</FilePath>
+              <FilePath>.\src\DRV\STM32F746ZG\ChipInfo.c</FilePath>
             </File>
             <File>
-              <FileName>RtcDrv.c</FileName>
+              <FileName>Clock_Drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\BSW\STM32F746ZG\RtcDrv.c</FilePath>
+              <FilePath>.\src\DRV\STM32F746ZG\Clock_Drv.c</FilePath>
             </File>
             <File>
-              <FileName>GpioDrv.c</FileName>
+              <FileName>Gpio_Drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\BSW\STM32F746ZG\GpioDrv.c</FilePath>
+              <FilePath>.\src\DRV\STM32F746ZG\Gpio_Drv.c</FilePath>
             </File>
             <File>
-              <FileName>UsartDrv.c</FileName>
+              <FileName>Gpio_Cfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\BSW\STM32F746ZG\UsartDrv.c</FilePath>
+              <FilePath>.\src\DRV\STM32F746ZG\Gpio_Cfg.c</FilePath>
             </File>
             <File>
-              <FileName>InterruptDrv.c</FileName>
+              <FileName>Interrupt_Drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\BSW\STM32F746ZG\InterruptDrv.c</FilePath>
+              <FilePath>.\src\DRV\STM32F746ZG\Interrupt_Drv.c</FilePath>
             </File>
             <File>
-              <FileName>LCDacm1602b.c</FileName>
+              <FileName>LCDACM1602B_Drv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\BSW\LCDacm1602b.c</FilePath>
+              <FilePath>.\src\DRV\LCDACM1602B_Drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>Rtc_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Rtc_Drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>Timer_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Timer_Drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Usart_Drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Usart_Cfg.c</FilePath>
             </File>
           </Files>
         </Group>

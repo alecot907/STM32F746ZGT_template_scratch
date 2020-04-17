@@ -37,8 +37,8 @@ function. */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-#include "GpioDrv.h"
-#include "UsartDrv.h"
+#include "Gpio_Drv.h"
+#include "Gpio_Cfg.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -54,15 +54,14 @@ function. */
 /* PRIVATE FUNCTIONS PROTOTYPES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* FUNCTIONS DECLARATIONS */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 /**************************************************************************************/
-/* GpioDrv_Init */
+/* Gpio_Drv_Init */
 /**************************************************************************************/
-void GpioDrv_Init (void)
+void Gpio_Drv_Init (void)
 {
 	/* Enable gpio clock */
 	SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOAEN);
@@ -77,48 +76,52 @@ void GpioDrv_Init (void)
 	SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOJEN);
 	SET_BIT(RCC->AHB1ENR, RCC_AHB1ENR_GPIOKEN);
 	
-	/* LED on the board (LD1(green):PB0  LD2(blue):PB7  LD3(red):PB14 ) */
-	// General purpose output mode
-	MODIFY_REG(GPIOB->MODER, (GPIO_MODER_MODER0 | GPIO_MODER_MODER7 | GPIO_MODER_MODER14),
-													 (GPIO_MODER_MODER0_0 | GPIO_MODER_MODER7_0 | GPIO_MODER_MODER14_0));
-	// Output push-pull
-	CLEAR_BIT(GPIOB->OTYPER, (GPIO_OTYPER_OT_0 | GPIO_OTYPER_OT_7 | GPIO_OTYPER_OT_14));
-	// no Pullup-pulldown
-	CLEAR_BIT(GPIOB->PUPDR, (GPIO_PUPDR_PUPDR0 | GPIO_PUPDR_PUPDR7 | GPIO_PUPDR_PUPDR14));
-
-
-	/* Button on the board (PC13) */
-	// Input mode
-	CLEAR_BIT(GPIOC->MODER, GPIO_MODER_MODER13);
-	// no Pullup-pulldown
-	CLEAR_BIT(GPIOC->PUPDR, GPIO_PUPDR_PUPDR13);
-
-	/* USART */
-	UsartDrv_GpioInit();
+	
+	for (GPIO_LIST_t gpio_list = GPIO_LIST_START; gpio_list < GPIO_LIST_TOTAL; gpio_list++)
+	{
+		MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->MODER, 0x03U << (Gpio_Drv_Regs[gpio_list].pin * 2U),
+							Gpio_Drv_Regs[gpio_list].mode << (Gpio_Drv_Regs[gpio_list].pin * 2U));
+		MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->OTYPER, 0x01 << Gpio_Drv_Regs[gpio_list].pin,
+							Gpio_Drv_Regs[gpio_list].out_type << Gpio_Drv_Regs[gpio_list].pin);
+		MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->OSPEEDR, 0x03U << (Gpio_Drv_Regs[gpio_list].pin * 2U),
+							Gpio_Drv_Regs[gpio_list].speed << (Gpio_Drv_Regs[gpio_list].pin * 2U));
+		MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->PUPDR, 0x03U << (Gpio_Drv_Regs[gpio_list].pin * 2U),
+							Gpio_Drv_Regs[gpio_list].pull_type << (Gpio_Drv_Regs[gpio_list].pin * 2U));
+		
+		if (Gpio_Drv_Regs[gpio_list].pin <= 0x07U)
+		{
+			MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->AFR[0], 0x0FU << (Gpio_Drv_Regs[gpio_list].pin * 4U),
+								Gpio_Drv_Regs[gpio_list].alt_func << (Gpio_Drv_Regs[gpio_list].pin * 4U));
+		}
+		else
+		{
+			MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->AFR[1], 0x0FU << (Gpio_Drv_Regs[gpio_list].pin * 4U),
+							Gpio_Drv_Regs[gpio_list].alt_func << (Gpio_Drv_Regs[gpio_list].pin * 4U));
+		}
+	}
 }
 
-
 /**************************************************************************************/
-/* GpioDrv_SetPin */
+/* Gpio_Drv_SetPin */
 /**************************************************************************************/
-void GpioDrv_SetPin (GPIO_TypeDef *port, uint8_t pin, GPIO_STATE gpio_state)
+void Gpio_Drv_SetPin (GPIO_TypeDef *port, uint8_t pin, LOGIC_STATE_t gpio_state)
 {
-	if (GPIO_LOW == gpio_state)
+	if (LOW == gpio_state)
 	{
-		WRITE_REG(port->BSRR, 1 << (pin + 16));
+		WRITE_REG(port->BSRR, 0x1U << (pin + 16U));
 	}
 	else
 	{
-		WRITE_REG(port->BSRR, (1 << pin));
+		WRITE_REG(port->BSRR, (0x1U << pin));
 	}
 }
 
 /**************************************************************************************/
-/* GpioDrv_GetPin */
+/* Gpio_Drv_GetPin */
 /**************************************************************************************/
-uint8_t GpioDrv_GetPin (GPIO_TypeDef *port, uint8_t pin)
+uint8_t Gpio_Drv_GetPin (GPIO_TypeDef *port, uint8_t pin)
 {
-	return ((READ_BIT(port->IDR, 1 << pin)) >> pin);
+	return ((READ_BIT(port->IDR, 0x1U << pin)) >> pin);
 }
 
 

@@ -1,48 +1,39 @@
-#ifndef __GPIODRV_H
-#define __GPIODRV_H
+#ifndef __GPIO_DRV_H
+#define __GPIO_DRV_H
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+#include "CommonDefs.h"
 #include "stm32f7xx.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-typedef enum {
-	GPIO_LOW = 0U,
-	GPIO_HIGH
-}GPIO_STATE;
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-/* LEDs */
-#define LED_GREEN_PORT		(GPIOB)
-#define LED_GREEN_PIN			(0)
-#define LED_BLUE_PORT			(GPIOB)
-#define LED_BLUE_PIN			(7)
-#define LED_RED_PORT			(GPIOB)
-#define LED_RED_PIN				(14)
-
-#define BUTTON_USER_PORT	(GPIOC)
-#define BUTTON_USER_PIN		(13)
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PUBLIC FUNCTIONS */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-void GpioDrv_Init (void);
 
 /**************************************************************************************/
-/* GpioDrv_SetPin */
+/* Gpio_Drv_Init */
 /**************************************************************************************/
-void GpioDrv_SetPin (GPIO_TypeDef *port, uint8_t pin, GPIO_STATE gpio_state);
+void Gpio_Drv_Init (void);
 
 /**************************************************************************************/
-/* GpioDrv_GetPin */
+/* Gpio_Drv_SetPin */
 /**************************************************************************************/
-uint8_t GpioDrv_GetPin (GPIO_TypeDef *port, uint8_t pin);
+void Gpio_Drv_SetPin (GPIO_TypeDef *port, uint8_t pin, LOGIC_STATE_t gpio_state);
+
+/**************************************************************************************/
+/* Gpio_Drv_GetPin */
+/**************************************************************************************/
+uint8_t Gpio_Drv_GetPin (GPIO_TypeDef *port, uint8_t pin);
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -50,4 +41,4 @@ uint8_t GpioDrv_GetPin (GPIO_TypeDef *port, uint8_t pin);
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 
-#endif /* __GPIODRV_H */
+#endif /* __GPIO_DRV_H */

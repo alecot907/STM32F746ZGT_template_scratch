@@ -1,55 +1,46 @@
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-#include "RtcDrv.h"
-#include "GpioDrv.h"
+#include "Rtc_Drv.h"
+#include "Rtc_Cfg.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-#define RTC_TR_PM_CFG		(1 << RTC_TR_PM_Pos)  //0: AM or 24-hour format    1: PM
-
-#define RTC_CR_FMT_CFG					(1)  /* 0:12h format   1:24h format */
-#define RCC_BDCR_RTCSEL_CFG			(RCC_BDCR_RTCSEL_0) /* LSE oscillator clock used as the RTC clock */
-#define RTC_PRER_PREDIV_S_CFG		(255)
-#define RTC_PRER_PREDIV_A_CFG		(127)
-
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-/* Initial values of RTC_Time and RTC_AlarmTime set to generate a Alarm interrupt
-10 seconds after startup if RTC_AlarmConfigure and RTC_AlarmEnable are called
-in the initialization procedure */
-RTC_Time_t RTC_Time = {00, 01, 01, SATURDAY,
-											 21, 00, 00};
-RTC_AlarmTime_t RTC_AlarmTime = {{0, 0, 0, 		 0, 	0},
-																 {01, 	21, 	00,  10}}; // day, hour, min, sec
-	
+const char RTC_DaysString[8U][5U] = {"NAD\0", "MON\0", "TUE\0", "WED\0", "THU\0", "FRI\0", "SAT\0", "SUN\0"};
+					
+RTC_Time_t RTC_TimeDefault = {00U, 01U, 01U, MONDAY,
+															00U, 00U, 00U};
+
+
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PRIVATE FUNCTIONS PROTOTYPES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 /**************************************************************************************/
-/* RTC_ByteToBcd2 */
+/* RTC_Drv_ByteToBcd2 */
 /**************************************************************************************/
-static uint8_t RTC_ByteToBcd2(uint8_t Value);
+static uint8_t RTC_Drv_ByteToBcd2(uint8_t Value);
 
 /**************************************************************************************/
-/* RTC_Bcd2ToByte */
+/* RTC_Drv_Bcd2ToByte */
 /**************************************************************************************/
-static uint8_t RTC_Bcd2ToByte(uint8_t Value);
+static uint8_t RTC_Drv_Bcd2ToByte(uint8_t Value);
 
 /**************************************************************************************/
-/* RTC_ProtectionEnable */
+/* RTC_Drv_ProtectionEnable */
 /**************************************************************************************/
-static void RTC_ProtectionEnable(void);
+static void RTC_Drv_ProtectionEnable(void);
 
 /**************************************************************************************/
-/* RTC_ProtectionDisable */
+/* RTC_Drv_ProtectionDisable */
 /**************************************************************************************/
-static void RTC_ProtectionDisable(void);
+static void RTC_Drv_ProtectionDisable(void);
 
 												
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -57,38 +48,37 @@ static void RTC_ProtectionDisable(void);
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 /**************************************************************************************/
-/* RTC_Init */
+/* RTC_Drv_Init */
 /**************************************************************************************/
-void RTC_Init (void)
+void RTC_Drv_Init (void)
 {	
 	/* Note: before calling this function, the source clock of RTC must be enabled and stable */
 	
 	/* RTC clock source */
-	MODIFY_REG(RCC->BDCR, RCC_BDCR_RTCSEL, RCC_BDCR_RTCSEL_CFG);
+	MODIFY_REG(RCC->BDCR, RCC_BDCR_RTCSEL, RCC_BDCR_RTCSEL_CFG << RCC_BDCR_RTCSEL_Pos);
 
 	/* RTC peripheral */
 	/* RTC clock enable */
 	SET_BIT(RCC->BDCR, RCC_BDCR_RTCEN);
 	
+	/* Just for test */
   /* Check if the RTC was never initialized (if year == 00) */
 	if(!READ_BIT(RTC->ISR, RTC_ISR_INITS))
 	{		
-		RTC_SetTime(&RTC_Time);
+		RTC_Drv_SetTime(&RTC_TimeDefault);
 	}
-	
-	RTC_GetTime(&RTC_Time);	
 }
 
 
 /**************************************************************************************/
 /* RTC_SetTime */
 /**************************************************************************************/
-void RTC_SetTime (RTC_Time_t *time)
+void RTC_Drv_SetTime (RTC_Time_t *time)
 {
 	uint32_t reg_temp;
 
 	/* Disable the RTC registers write protection */
-	RTC_ProtectionDisable();
+	RTC_Drv_ProtectionDisable();
 	
 	/* Enter Initialization mode */
 	SET_BIT(RTC->ISR, RTC_ISR_INIT);
@@ -104,23 +94,23 @@ void RTC_SetTime (RTC_Time_t *time)
 	SET_BIT(RTC->PRER, reg_temp);
 	
 	/* Load time and date values in the shadow registers */		
-	reg_temp = 	RTC_TR_PM_CFG 	| 
-							(((((uint32_t) RTC_ByteToBcd2(time->Hour)) >> 4)) << RTC_TR_HT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(time->Hour)) & 0xF)) << RTC_TR_HU_Pos) |
-							(((((uint32_t) RTC_ByteToBcd2(time->Minute)) >> 4)) << RTC_TR_MNT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(time->Minute)) & 0xF)) << RTC_TR_MNU_Pos) |
-							(((((uint32_t) RTC_ByteToBcd2(time->Second)) >> 4)) << RTC_TR_ST_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(time->Second)) & 0xF)) << RTC_TR_SU_Pos);
+	reg_temp = 	(RTC_TR_PM_CFG << RTC_TR_PM_Pos) 	| 
+							(((((uint32_t) RTC_Drv_ByteToBcd2(time->Hour)) >> 4U)) << RTC_TR_HT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(time->Hour)) & 0xFU)) << RTC_TR_HU_Pos) |
+							(((((uint32_t) RTC_Drv_ByteToBcd2(time->Minute)) >> 4U)) << RTC_TR_MNT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(time->Minute)) & 0xFU)) << RTC_TR_MNU_Pos) |
+							(((((uint32_t) RTC_Drv_ByteToBcd2(time->Second)) >> 4U)) << RTC_TR_ST_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(time->Second)) & 0xFU)) << RTC_TR_SU_Pos);
 	WRITE_REG(RTC->TR, reg_temp);
 	
 	
-	reg_temp =	(((((uint32_t) RTC_ByteToBcd2(time->Year)) >> 4)) << RTC_DR_YT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(time->Year)) & 0xF)) << RTC_DR_YU_Pos) |
+	reg_temp =	(((((uint32_t) RTC_Drv_ByteToBcd2(time->Year)) >> 4U)) << RTC_DR_YT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(time->Year)) & 0xFU)) << RTC_DR_YU_Pos) |
 							(time->DayOfWeek << RTC_DR_WDU_Pos) 	| 
-							(((((uint32_t) RTC_ByteToBcd2(time->Month)) >> 4)) << RTC_DR_MT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(time->Month)) & 0xF)) << RTC_DR_MU_Pos) |
-							(((((uint32_t) RTC_ByteToBcd2(time->Day)) >> 4)) << RTC_DR_DT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(time->Day)) & 0xF)) << RTC_DR_DU_Pos);
+							(((((uint32_t) RTC_Drv_ByteToBcd2(time->Month)) >> 4U)) << RTC_DR_MT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(time->Month)) & 0xFU)) << RTC_DR_MU_Pos) |
+							(((((uint32_t) RTC_Drv_ByteToBcd2(time->Day)) >> 4U)) << RTC_DR_DT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(time->Day)) & 0xFU)) << RTC_DR_DU_Pos);
 	WRITE_REG(RTC->DR, reg_temp);		
 	
 	/* Exit Initialization mode */
@@ -131,13 +121,13 @@ void RTC_SetTime (RTC_Time_t *time)
 	while(!READ_BIT(RTC->ISR, RTC_ISR_RSF));	
 
 	/* Enable the RTC Registers Write Protection */
-	RTC_ProtectionEnable();
+	RTC_Drv_ProtectionEnable();
 }
 
 /**************************************************************************************/
-/* RTC_GetTime */
+/* RTC_Drv_GetTime */
 /**************************************************************************************/
-void RTC_GetTime (RTC_Time_t *time)
+void RTC_Drv_GetTime (RTC_Time_t *time)
 {
 	/*The RSF bit is set in RTC_ISR register each time the calendar registers are copied into the
 	RTC_SSR, RTC_TR and RTC_DR shadow registers. The copy is performed every
@@ -158,24 +148,24 @@ void RTC_GetTime (RTC_Time_t *time)
 	time->Day = 			((reg_temp & (RTC_DR_DT | RTC_DR_DU))) >> RTC_DR_DU_Pos;
 	
 	/* Conversion from BDC to byte */
-	time->Hour = (uint8_t)RTC_Bcd2ToByte(time->Hour);
-	time->Minute = (uint8_t)RTC_Bcd2ToByte(time->Minute);
-	time->Second = (uint8_t)RTC_Bcd2ToByte(time->Second);
+	time->Hour = (uint8_t)RTC_Drv_Bcd2ToByte(time->Hour);
+	time->Minute = (uint8_t)RTC_Drv_Bcd2ToByte(time->Minute);
+	time->Second = (uint8_t)RTC_Drv_Bcd2ToByte(time->Second);
 	
-	time->Year = (uint8_t)RTC_Bcd2ToByte(time->Year);
-	time->DayOfWeek = (RTC_DayOfWeek_t) RTC_Bcd2ToByte(time->DayOfWeek);
-	time->Month = (uint8_t)RTC_Bcd2ToByte(time->Month);
-	time->Day = (uint8_t)RTC_Bcd2ToByte(time->Day);
+	time->Year = (uint8_t)RTC_Drv_Bcd2ToByte(time->Year);
+	time->DayOfWeek = (RTC_DayOfWeek_t) RTC_Drv_Bcd2ToByte(time->DayOfWeek);
+	time->Month = (uint8_t)RTC_Drv_Bcd2ToByte(time->Month);
+	time->Day = (uint8_t)RTC_Drv_Bcd2ToByte(time->Day);
 }
 
 /**************************************************************************************/
-/* RtcDrv_AlarmInt */
+/* Rtc_Drv_AlarmInt */
 /**************************************************************************************/
-void RtcDrv_AlarmInt (void)
+void Rtc_Drv_AlarmInt (void)
 {
 	/* Enable RTC alarm interrupt */
-	/*Configure and enable the EXTI line corresponding to the RTC Alarm event in interrupt
-		mode and select the rising edge sensitivity. EXTI line 17 is connected to the RTC Alarm event */
+//	/*Configure and enable the EXTI line corresponding to the RTC Alarm event in interrupt
+//		mode and select the rising edge sensitivity. EXTI line 17 is connected to the RTC Alarm event */
 	SET_BIT(EXTI->IMR, EXTI_IMR_IM17);
 	SET_BIT(EXTI->RTSR, EXTI_RTSR_TR17);
 	
@@ -188,12 +178,12 @@ void RtcDrv_AlarmInt (void)
 /**************************************************************************************/
 /* RTC_AlarmConfigure */
 /**************************************************************************************/
-void RTC_AlarmConfigure (RTC_AlarmTime_t *alarmtime)
+void RTC_Drv_AlarmConfigure (RTC_AlarmTime_t *alarmtime)
 {
 	uint32_t reg_temp;
 
 	/* Disable the RTC registers write protection */
-	RTC_ProtectionDisable();
+	RTC_Drv_ProtectionDisable();
 	
 	/* Disable alarm A */
 	CLEAR_BIT(RTC->CR, RTC_CR_ALRAE);
@@ -202,15 +192,15 @@ void RTC_AlarmConfigure (RTC_AlarmTime_t *alarmtime)
 	while(!READ_BIT(RTC->ISR, RTC_ISR_ALRAWF));
 	
 	/* Configure the alarm */
-	reg_temp = 	(((((uint32_t) RTC_ByteToBcd2(alarmtime->Value.DayOrDate)) >> 4)) << RTC_ALRMAR_DT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(alarmtime->Value.DayOrDate)) & 0xF)) << RTC_ALRMAR_DU_Pos) |
-							(((((uint32_t) RTC_ByteToBcd2(alarmtime->Value.Hour)) >> 4)) << RTC_ALRMAR_HT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(alarmtime->Value.Hour)) & 0xF)) << RTC_ALRMAR_HU_Pos) |
-							(((((uint32_t) RTC_ByteToBcd2(alarmtime->Value.Minute)) >> 4)) << RTC_ALRMAR_MNT_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(alarmtime->Value.Minute)) & 0xF)) << RTC_ALRMAR_MNU_Pos) |
-							(((((uint32_t) RTC_ByteToBcd2(alarmtime->Value.Second)) >> 4)) << RTC_ALRMAR_ST_Pos) |
-							(((((uint32_t)RTC_ByteToBcd2(alarmtime->Value.Second)) & 0xF)) << RTC_ALRMAR_SU_Pos);
-	reg_temp |= RTC_TR_PM_CFG 	| 
+	reg_temp = 	(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.DayOrDate)) >> 4U)) << RTC_ALRMAR_DT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.DayOrDate)) & 0xFU)) << RTC_ALRMAR_DU_Pos) |
+							(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.Hour)) >> 4U)) << RTC_ALRMAR_HT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.Hour)) & 0xFU)) << RTC_ALRMAR_HU_Pos) |
+							(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.Minute)) >> 4U)) << RTC_ALRMAR_MNT_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.Minute)) & 0xFU)) << RTC_ALRMAR_MNU_Pos) |
+							(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.Second)) >> 4U)) << RTC_ALRMAR_ST_Pos) |
+							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.Second)) & 0xFU)) << RTC_ALRMAR_SU_Pos);
+	reg_temp |= (RTC_TR_PM_CFG << RTC_TR_PM_Pos) 	| 
 							(((uint32_t) alarmtime->Mask.DayOrDate) << RTC_ALRMAR_MSK4_Pos) |
 							(((uint32_t) alarmtime->Mask.DayOrDateSelection) << RTC_ALRMAR_WDSEL_Pos) |
 							(((uint32_t) alarmtime->Mask.Hour) << RTC_ALRMAR_MSK3_Pos) |
@@ -219,16 +209,16 @@ void RTC_AlarmConfigure (RTC_AlarmTime_t *alarmtime)
 	WRITE_REG(RTC->ALRMAR, reg_temp);
 		
 	/* Enable the RTC registers write protection */
-	RTC_ProtectionEnable();
+	RTC_Drv_ProtectionEnable();
 }
 
 /**************************************************************************************/
-/* RTC_AlarmEnable */
+/* RTC_Drv_AlarmEnable */
 /**************************************************************************************/
-void RTC_AlarmEnable (void)
+void RTC_Drv_AlarmEnable (void)
 {
 	/* Disable the RTC registers write protection */
-	RTC_ProtectionDisable();
+	RTC_Drv_ProtectionDisable();
 	
 	/* Enable RTC alarm A interrupt */
 	SET_BIT(RTC->CR, RTC_CR_ALRAIE);
@@ -237,16 +227,16 @@ void RTC_AlarmEnable (void)
 	SET_BIT(RTC->CR, RTC_CR_ALRAE);
 
 	/* Enable the RTC registers write protection */
-	RTC_ProtectionEnable();
+	RTC_Drv_ProtectionEnable();
 }
 
 /**************************************************************************************/
-/* RTC_AlarmDisable */
+/* RTC_Drv_AlarmDisable */
 /**************************************************************************************/
-void RTC_AlarmDisable (void)
+void RTC_Drv_AlarmDisable (void)
 {
 	/* Disable the RTC registers write protection */
-	RTC_ProtectionDisable();
+	RTC_Drv_ProtectionDisable();
 	
 	/* Disable RTC alarm A interrupt */
 	CLEAR_BIT(RTC->CR, RTC_CR_ALRAIE);
@@ -255,40 +245,47 @@ void RTC_AlarmDisable (void)
 	CLEAR_BIT(RTC->CR, RTC_CR_ALRAE);
 
 	/* Enable the RTC registers write protection */
-	RTC_ProtectionEnable();
+	RTC_Drv_ProtectionEnable();
 }
 
-
 /**************************************************************************************/
-/* RTC_ByteToBcd2 */
+/* RTC_Drv_AlarmIsEnabled */
 /**************************************************************************************/
-static uint8_t RTC_ByteToBcd2(uint8_t Value)
+RTC_AlarmIsEnabled_t RTC_Drv_AlarmIsEnabled (void)
 {
-  uint32_t bcdhigh = 0;
+	return ((RTC_AlarmIsEnabled_t) (READ_BIT(RTC->CR, RTC_CR_ALRAE) >> RTC_CR_ALRAE_Pos));
+}
 
-  while(Value >= 10)
+/**************************************************************************************/
+/* RTC_Drv_ByteToBcd2 */
+/**************************************************************************************/
+static uint8_t RTC_Drv_ByteToBcd2(uint8_t Value)
+{
+  uint32_t bcdhigh = 0U;
+
+  while(Value >= 10U)
   {
     bcdhigh++;
-    Value -= 10;
+    Value -= 10U;
   }
 
   return  ((uint8_t)(bcdhigh << 4) | Value);
 }
 
 /**************************************************************************************/
-/* RTC_Bcd2ToByte */
+/* RTC_Drv_Bcd2ToByte */
 /**************************************************************************************/
-static uint8_t RTC_Bcd2ToByte(uint8_t Value)
+static uint8_t RTC_Drv_Bcd2ToByte(uint8_t Value)
 {
-  uint32_t tmp = 0;
+  uint32_t tmp = 0U;
   tmp = ((uint8_t)(Value & (uint8_t)0xF0) >> (uint8_t)0x4) * 10;
   return (tmp + (Value & (uint8_t)0x0F));
 }
 
 /**************************************************************************************/
-/* RTC_ProtectionDisable */
+/* RTC_Drv_ProtectionDisable */
 /**************************************************************************************/
-static void RTC_ProtectionDisable(void)
+static void RTC_Drv_ProtectionDisable(void)
 {
 	/* Disable the RTC registers write protection */
 		WRITE_REG(RTC->WPR, 0xCAU);
@@ -296,9 +293,9 @@ static void RTC_ProtectionDisable(void)
 }
 
 /**************************************************************************************/
-/* RTC_ProtectionEnable */
+/* RTC_Drv_ProtectionEnable */
 /**************************************************************************************/
-static void RTC_ProtectionEnable(void)
+static void RTC_Drv_ProtectionEnable(void)
 {
 		/* Enable the RTC Registers Write Protection */
 		WRITE_REG(RTC->WPR, 0xFFU);
@@ -315,9 +312,6 @@ void RTC_Alarm_IRQHandler (void)
 	/* Il RTC alarm A was triggered */
 	if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
 	{
-	/* Clear alarm flag */
-//		CLEAR_BIT(RTC->ISR, RTC_ISR_ALRAF);
-//		GpioDrv_SetPin(LED_RED_PORT, LED_RED_PIN, GPIO_LOW);
 	}
 }
 

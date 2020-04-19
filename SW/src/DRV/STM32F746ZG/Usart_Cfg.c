@@ -18,10 +18,8 @@
 const Usart_Drv_Regs_t Usart_Drv_Regs[USART_LIST_TOTAL] = 
 {
 	{
-		0x2U,
 		USART2,
 		UART2_RX_PIN,
-		USART2_IRQn,
 		6UL,
 		
 		USART_CLOCKSEL_APBx,

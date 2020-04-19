@@ -3,6 +3,8 @@
 
 #include "ChipInfo.h"
 #include "Clock_Drv.h"
+#include "Timer_Drv.h"
+#include "Timer_Cfg.h"
 #include "Rtc_Drv.h"
 
 #include "Gpio_Drv.h"
@@ -25,6 +27,9 @@ int main(void)
 	/* Clock initialization */
 	result &= Clock_Drv_Init();	
 	
+	/* Timer initialization */
+	Timer_Drv_Init();
+		
 	/* Rtc initialization */
 	RTC_Drv_Init();
 	
@@ -44,39 +49,40 @@ int main(void)
 	Interrupt_Drv_Init();
 	
 	
-	
+
 	
 	/*****************  TEST  **************************************/
-	MODIFY_REG(GPIOB->MODER, 0x03U << (8 * 2U), 0x01U << (8 * 2U));
-	CLEAR_BIT(GPIOB->OTYPER, 0x01 << 8);
-	CLEAR_BIT(GPIOB->PUPDR, 0x03U << (8 * 2U));
-	
-	Gpio_Drv_SetPin(GPIOB, 8, HIGH);
-	Gpio_Drv_SetPin(GPIOB, 8, LOW);
-
-	RTC_Drv_AlarmConfigure(&RTC_AlarmTime);
-	RTC_Drv_AlarmEnable();
-
 	Gpio_Drv_SetPin(LED_BLUE_PORT, LED_BLUE_PIN, HIGH);
 	Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
 	Gpio_Drv_SetPin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
 	
+//	MODIFY_REG(GPIOB->MODER, 0x03U << (8 * 2U), 0x01U << (8 * 2U));
+//	CLEAR_BIT(GPIOB->OTYPER, 0x01 << 8);
+//	CLEAR_BIT(GPIOB->PUPDR, 0x03U << (8 * 2U));
+//	
+//	Gpio_Drv_SetPin(GPIOB, 8, HIGH);
+//	Gpio_Drv_SetPin(GPIOB, 8, LOW);
+
+//	RTC_Drv_AlarmConfigure(&RTC_AlarmTime);
+//	RTC_Drv_AlarmEnable();
+
 	
-	static uint8_t prova[10] = {3,4,5,6,7,8,9,1,2,3};
-//	UsartData_InitTXint(USART2_DBG_CMD, prova, 10);
-	UsartData_TXpoll(USART2_DBG_CMD, prova, 10);
-	UsartString_TXpoll(USART2_DBG_CMD, "Greve zi!",10);
+//	static uint8_t prova[10] = {3,4,5,6,7,8,9,1,2,3};
+////	UsartData_InitTXint(USART2_DBG_CMD, prova, 10);
+//	UsartData_TXpoll(USART2_DBG_CMD, prova, 10);
+//	UsartString_TXpoll(USART2_DBG_CMD, "Greve zi!",10);
+	
 	
 	while(1)
-	{
+	{		
 		if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
 		{
 			Gpio_Drv_SetPin(GPIOB, 8, HIGH);
 			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
-			Delay_ms(1);
+			Delay_us(1000);
 			Gpio_Drv_SetPin(GPIOB, 8, LOW);
 			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, LOW);
-			Delay_ms(1);
+			Delay_us(1000);
 		}
 
 		AcquireInput();

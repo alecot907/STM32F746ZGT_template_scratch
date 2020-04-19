@@ -2,6 +2,7 @@
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #include "Timer_Drv.h"
+#include "Timer_DrvDefs.h"
 #include "Timer_Cfg.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -23,6 +24,22 @@
 /**************************************************************************************/
 static void Timer_Drv_BasicTimer_Init (void);
 
+/**************************************************************************************/
+/* Timer_Drv_BasicTimer_Start */
+/**************************************************************************************/
+static void Timer_Drv_BasicTimer_Start (TIMERBASIC_LIST_t timer_list);
+
+/**************************************************************************************/
+/* Timer_Drv_BasicTimer_Stop */
+/**************************************************************************************/
+static void Timer_Drv_BasicTimer_Stop (TIMERBASIC_LIST_t timer_list);
+
+/**************************************************************************************/
+/* Timer_Drv_BasicTimer_Int */
+/**************************************************************************************/
+static void Timer_Drv_BasicTimer_Int (void);
+
+
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* FUNCTIONS DECLARATIONS */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -35,13 +52,131 @@ static void Timer_Drv_BasicTimer_Init (void);
 void Timer_Drv_Init (void)
 {
 	Timer_Drv_BasicTimer_Init();
+		
+	Timer_Drv_BasicTimer_Int();
 }
 
+/**************************************************************************************/
+/* Timer_Drv_Start */
+/**************************************************************************************/
+void Timer_Drv_Start (TIMERBASIC_LIST_t timer_list)
+{
+	Timer_Drv_BasicTimer_Start(timer_list);
+}
+
+/**************************************************************************************/
+/* Timer_Drv_Stop */
+/**************************************************************************************/
+void Timer_Drv_Stop (TIMERBASIC_LIST_t timer_list)
+{
+	Timer_Drv_BasicTimer_Stop(timer_list);
+}
+
+
+/**************************************************************************************/
+/* Timer_Drv_Int */
+/**************************************************************************************/
+void Timer_Drv_Int (void)
+{
+	Timer_Drv_BasicTimer_Int();
+}
 
 /**************************************************************************************/
 /* Timer_Drv_BasicTimer_Init */
 /**************************************************************************************/
 static void Timer_Drv_BasicTimer_Init (void)
 {
+	/* Clock source is from APB1 */
+	uint16_t reg_temp;
 	
+	for (TIMERBASIC_LIST_t timer_list = TIMERBASIC_LIST_START; timer_list < TIMERBASIC_LIST_TOTAL; timer_list++)
+	{
+		TIM_TypeDef *timer = TimerBasic_Drv_Regs[timer_list].timer;
+		
+		switch ((uint32_t) timer)
+		{
+			case (TIM6_BASE):
+				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_TIM6EN);
+				break;
+			case (TIM7_BASE):
+				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_TIM7EN);
+				break;
+			default:
+				break;
+		}
+		
+		reg_temp = (TimerBasic_Drv_Regs[timer_list].CR1_UifRemap << TIM_CR1_UIFREMAP_Pos) |
+								(TimerBasic_Drv_Regs[timer_list].CR1_AutoReload << TIM_CR1_ARPE_Pos) |
+								(TimerBasic_Drv_Regs[timer_list].CR1_OnePulseMode << TIM_CR1_OPM_Pos) |
+								(TimerBasic_Drv_Regs[timer_list].CR1_UpdateReqSource << TIM_CR1_URS_Pos) |
+								(TimerBasic_Drv_Regs[timer_list].CR1_UpdateDisable << TIM_CR1_UDIS_Pos);
+		MODIFY_REG(timer->CR1, 0xFFFF, reg_temp);
+		
+		reg_temp = (TimerBasic_Drv_Regs[timer_list].CR2_MasterMode << TIM_CR2_MMS_Pos);
+		MODIFY_REG(timer->CR2, 0xFFFF, reg_temp);
+		
+		reg_temp = (TimerBasic_Drv_Regs[timer_list].DIER_UpdateDmaReq << TIM_DIER_UDE_Pos) |
+								(TimerBasic_Drv_Regs[timer_list].DIER_UpdateInterrupt << TIM_DIER_UIE_Pos);
+		MODIFY_REG(timer->DIER, 0xFFFF, reg_temp);
+		
+		/* set prescaler */
+		MODIFY_REG(timer->PSC, 0xFFFF, TimerBasic_Drv_Regs[timer_list].PreScaler - 0x1U);
+		MODIFY_REG(timer->ARR, 0xFFFF, TimerBasic_Drv_Regs[timer_list].AutoReloadValue - 0x1U);
+	}
 }
+
+/**************************************************************************************/
+/* Timer_Drv_BasicTimer_Start */
+/**************************************************************************************/
+static void Timer_Drv_BasicTimer_Start (TIMERBASIC_LIST_t timer_list)
+{
+	TIM_TypeDef *timer = TimerBasic_Drv_Regs[timer_list].timer;
+	
+	SET_BIT(timer->CR1, TIM_CR1_CEN);
+}
+
+/**************************************************************************************/
+/* Timer_Drv_BasicTimer_Stop */
+/**************************************************************************************/
+static void Timer_Drv_BasicTimer_Stop (TIMERBASIC_LIST_t timer_list)
+{
+	TIM_TypeDef *timer = TimerBasic_Drv_Regs[timer_list].timer;
+	
+	CLEAR_BIT(timer->CR1, TIM_CR1_CEN);
+}
+
+
+/**************************************************************************************/
+/* Timer_Drv_BasicTimer_Int */
+/**************************************************************************************/
+static void Timer_Drv_BasicTimer_Int (void)
+{
+	IRQn_Type 	Int_number;
+	uint32_t		Int_priority;
+	
+	for (TIMERBASIC_LIST_t timer_list = TIMERBASIC_LIST_START; timer_list < TIMERBASIC_LIST_TOTAL; timer_list++)
+	{
+		TIM_TypeDef *timer = TimerBasic_Drv_Regs[timer_list].timer;
+		
+		/* Enable peripheral clock */
+		switch ((uint32_t) timer)
+		{
+			case TIM6_BASE:
+				Int_number = TIM6_DAC_IRQn;
+				Int_priority = TimerBasic_Drv_Regs[timer_list].Int_priority;
+				break;
+			case TIM7_BASE:
+				Int_number = TIM7_IRQn;
+				Int_priority = TimerBasic_Drv_Regs[timer_list].Int_priority;
+				break;
+			default:
+				break;
+		}
+		
+		NVIC_SetPriority (Int_number, (Int_priority << __NVIC_PRIO_BITS) - 1UL);
+		NVIC_EnableIRQ(Int_number);
+	}
+}
+
+
+

@@ -33,7 +33,6 @@ typedef enum
 
 #define GPIO_LIST_START	(GPIO_LED_GREEN)
 #define GPIO_LIST_TOTAL	(GPIO_NOF)
-#define GPIO_LIST_COUNT	(GPIO_LIST_TOTAL - 0x1U)
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/

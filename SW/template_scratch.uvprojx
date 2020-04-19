@@ -428,14 +428,14 @@
               <FilePath>.\src\DRV\STM32F746ZG\Clock_Drv.c</FilePath>
             </File>
             <File>
-              <FileName>Gpio_Drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\DRV\STM32F746ZG\Gpio_Drv.c</FilePath>
-            </File>
-            <File>
               <FileName>Gpio_Cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\DRV\STM32F746ZG\Gpio_Cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>Gpio_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Gpio_Drv.c</FilePath>
             </File>
             <File>
               <FileName>Interrupt_Drv.c</FileName>
@@ -453,19 +453,24 @@
               <FilePath>.\src\DRV\STM32F746ZG\Rtc_Drv.c</FilePath>
             </File>
             <File>
+              <FileName>Timer_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Timer_Cfg.c</FilePath>
+            </File>
+            <File>
               <FileName>Timer_Drv.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\DRV\STM32F746ZG\Timer_Drv.c</FilePath>
             </File>
             <File>
-              <FileName>Usart_Drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\DRV\STM32F746ZG\Usart_Drv.c</FilePath>
-            </File>
-            <File>
               <FileName>Usart_Cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\DRV\STM32F746ZG\Usart_Cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>Usart_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Usart_Drv.c</FilePath>
             </File>
           </Files>
         </Group>

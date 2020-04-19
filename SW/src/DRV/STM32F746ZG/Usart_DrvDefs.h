@@ -75,10 +75,8 @@ typedef enum {
 
 typedef struct
 {
-	uint8_t									UsartNumber;
 	USART_TypeDef 					*port;
 	uint8_t									RX_pin;
-	IRQn_Type								Int_number;
 	uint32_t								Int_priority;
 	
 	USART_CLOCKSEL_t				DCKCFGR2_ClockSelection;
@@ -116,6 +114,5 @@ typedef struct
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* EXTERN VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-
 
 #endif /* __USART_DRVDEFS_H */

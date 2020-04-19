@@ -7,7 +7,7 @@
 #include "LCDACM1602B_Drv.h"
 #include "LCDACM1602B_Cfg.h"
 #include "Gpio_Drv.h"
-#include "Clock_Drv.h"
+#include "Timer_Cfg.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -63,25 +63,25 @@ void LCDACM1602B_Drv_Init (void)
 {
 	// according to datasheet, we need at least 40ms after power rises above 2.7V
   // before sending commands. Arduino can turn on way before 4.5V so we'll wait 50
-	Delay_ms(50);
+	Delay_us(50000UL);
 		
 	Gpio_Drv_SetPin(LCDACM1602B_E_PORT, LCDACM1602B_E_PIN, LOW);
 	Gpio_Drv_SetPin(LCDACM1602B_RS_PORT, LCDACM1602B_RS_PIN, LOW);
 	
 	/* Init procedure for 4-bits mode */
-	LCDACM1602B_Drv_Send4bits(0b0011);
-	Delay_ms(5);
-	LCDACM1602B_Drv_Send4bits(0b0011);
-	Delay_ms(1);
-	LCDACM1602B_Drv_Send4bits(0b0011);
-	LCDACM1602B_Drv_Send4bits(0b0010);
+	LCDACM1602B_Drv_Send4bits(0x3U);
+	Delay_us(4200UL);
+	LCDACM1602B_Drv_Send4bits(0x3U);
+	Delay_us(150UL);
+	LCDACM1602B_Drv_Send4bits(0x3U);
+	LCDACM1602B_Drv_Send4bits(0x2U);
 	
 	/* Set mode(only 4-bit with this driver), lines, dots */
 	LCDACM1602B_Drv_SendCmd(CMD_FUNCTION_SET);
 	
 	/* Set display state, cursor and brink */
 	LCDACM1602B_Drv_SendCmd(CMD_DISPLAY_CTRL);
-	Delay_ms(2);
+	Delay_us(2000UL);
 	
 	/* Clear Display */
 	LCDACM1602B_Drv_SendCmd(CMD_CLEARDISPLAY);
@@ -165,9 +165,9 @@ static void LCDACM1602B_Drv_Send4bits (uint8_t bits)
 static void LCDACM1602B_Drv_EnablePulse (void)
 {
 	Gpio_Drv_SetPin(LCDACM1602B_E_PORT, LCDACM1602B_E_PIN, LOW);
-	Delay_ms(1);
+	Delay_us(1);
 	Gpio_Drv_SetPin(LCDACM1602B_E_PORT, LCDACM1602B_E_PIN, HIGH);
-	Delay_ms(1);
+	Delay_us(1);  // enable pulse must be >450ns
 	Gpio_Drv_SetPin(LCDACM1602B_E_PORT, LCDACM1602B_E_PIN, LOW);
-	Delay_ms(1);
+	Delay_us(100);  // commands need > 37us to settle
 }

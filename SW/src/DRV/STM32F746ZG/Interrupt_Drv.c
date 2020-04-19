@@ -5,6 +5,7 @@
 #include "Clock_Drv.h"
 #include "Rtc_Drv.h"
 #include "Usart_Drv.h"
+#include "Timer_Drv.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -38,4 +39,7 @@ void Interrupt_Drv_Init(void)
 	
 	/* UART */
 	Usart_Drv_Int();
+	
+//	/* Timers */
+//	Timer_Drv_Int();
 }

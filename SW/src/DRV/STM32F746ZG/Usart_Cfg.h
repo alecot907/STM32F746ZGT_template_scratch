@@ -13,21 +13,21 @@
 #define MAX_BYTE_TXBUFF							(128U)  // maximum bytes to TX in the buffers
 
 /* Pin configuration */
-#define UART2_TX_PORT			(GPIOD)
+#define UART2_TX_PORT			((GPIO_TypeDef *) (GPIOD))
 #define UART2_TX_PIN			(0x5U)
-#define UART2_TX_MODE			(GPIO_MODER_ALTFUNC)
-#define UART2_TX_OUTTYPE	(GPIO_OTYPER_PUSHPULL)
-#define UART2_TX_SPEEED		(GPIO_OSPEEDR_VERYHIGH)
-#define UART2_TX_PULLTYPE	(GPIO_POPDR_UP)
-#define UART2_TX_ALTFUNC	(GPIO_AFR_7)
+#define UART2_TX_MODE			((Gpio_Drv_Moder_t) GPIO_MODER_ALTFUNC)
+#define UART2_TX_OUTTYPE	((Gpio_Drv_Otyper_t) GPIO_OTYPER_PUSHPULL)
+#define UART2_TX_SPEEED		((Gpio_Drv_Ospeedr_t) GPIO_OSPEEDR_VERYHIGH)
+#define UART2_TX_PULLTYPE	((Gpio_Drv_Popdr_t) GPIO_POPDR_UP)
+#define UART2_TX_ALTFUNC	((Gpio_Drv_Afr_t) GPIO_AFR_7)
 
-#define UART2_RX_PORT			(GPIOD)
+#define UART2_RX_PORT			((GPIO_TypeDef *) (GPIOD))
 #define UART2_RX_PIN			(0x6U)
-#define UART2_RX_MODE			(GPIO_MODER_ALTFUNC)
-#define UART2_RX_OUTTYPE	(GPIO_OTYPER_PUSHPULL)
-#define UART2_RX_SPEEED		(GPIO_OSPEEDR_VERYHIGH)
-#define UART2_RX_PULLTYPE	(GPIO_POPDR_NO)
-#define UART2_RX_ALTFUNC	(GPIO_AFR_7)
+#define UART2_RX_MODE			((Gpio_Drv_Moder_t) GPIO_MODER_ALTFUNC)
+#define UART2_RX_OUTTYPE	((Gpio_Drv_Otyper_t) GPIO_OTYPER_PUSHPULL)
+#define UART2_RX_SPEEED		((Gpio_Drv_Ospeedr_t) GPIO_OSPEEDR_VERYHIGH)
+#define UART2_RX_PULLTYPE	((Gpio_Drv_Popdr_t) GPIO_POPDR_NO)
+#define UART2_RX_ALTFUNC	((Gpio_Drv_Afr_t) GPIO_AFR_7)
 
 
 #define USART2_PARITYENABLE_CFG		(USART_DISABLED)  // 0: Parity control disabled		1: Parity control enabled

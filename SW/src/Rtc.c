@@ -2,8 +2,10 @@
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #include "Rtc.h"
-#include "SysData.h"
+#include "AcquireInput.h"
 #include "CommonDefs.h"
+#include "Timer_Drv.h"
+
 #include <string.h>
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -28,7 +30,7 @@ RTC_AlarmTimeValueUart_t	RTC_AlarmTimeValueUart;
 
 																 
 static uint8_t button_old = 0x0U;
-static uint8_t alarm_state = 0x0U;
+static LOGIC_STATE_t alarm_state = LOW, alarm_state_old = LOW;
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PRIVATE FUNCTIONS PROTOTYPES */
@@ -47,12 +49,8 @@ static void Rtc_AlarmCfg (void);
 /**************************************************************************************/
 /* Rtc_AlarmEnDis */
 /**************************************************************************************/
-static void Rtc_AlarmEnDis (void);
+static void Rtc_AlarmMng (void);
 
-/**************************************************************************************/
-/* Rtc_AlarmTriggered */
-/**************************************************************************************/
-static void Rtc_AlarmTriggered (void);
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -68,29 +66,49 @@ void Rtc_Mng (void)
 	
 	Rtc_TimeDateCfg();
 	
-	Rtc_AlarmEnDis();
-	
-	Rtc_AlarmTriggered();
+	Rtc_AlarmMng();
 }
 
 /**************************************************************************************/
 /* Rtc_AlarmEnDis */
 /**************************************************************************************/
-static void Rtc_AlarmEnDis (void)
+static void Rtc_AlarmMng (void)
 {
-	if ((HIGH == SysData_Der[SYS_IN_BUTTONUSR]) && (LOW == button_old))
+	/* Button check */
+	if ((HIGH == INPUT_QUAL(SysData_In[SYS_IN_BUTTONUSR])) && (LOW == button_old))
 	{
-		alarm_state = !alarm_state;
+		alarm_state = (LOGIC_STATE_t) (!alarm_state);
 	}
-	button_old = SysData_Der[SYS_IN_BUTTONUSR];
+	button_old = INPUT_QUAL(SysData_In[SYS_IN_BUTTONUSR]);
 	
-	if (alarm_state)
+	
+	/* Alarm state check */
+	if ((HIGH == alarm_state) && (LOW == alarm_state_old))
 	{
 		RTC_Drv_AlarmEnable();
 	}
-	else
+	else if ((LOW == alarm_state) && (HIGH == alarm_state_old))
 	{
+		if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
+		{
+			/* Clear alarm flag */
+			CLEAR_BIT(RTC->ISR, RTC_ISR_ALRAF);
+			/* Activate alarm speaker */
+			Timer_Drv_Stop(TIMEGENERAL_PWM_14);
+			Timer_Drv_PwmSetDuty(TIMEGENERAL_PWM_14, 0U);
+		}
+
 		RTC_Drv_AlarmDisable();
+	}
+	alarm_state_old = alarm_state;
+	
+	
+	/* Il RTC alarm A was triggered */
+	if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
+	{		
+		/* Activate alarm speaker */
+		Timer_Drv_Start(TIMEGENERAL_PWM_14);
+		Timer_Drv_PwmSetDuty(TIMEGENERAL_PWM_14, 500U);
 	}
 }
 
@@ -124,20 +142,6 @@ static void Rtc_TimeDateCfg (void)
 		// TODO: Check CRC!!!!!
 				
 		RTC_Drv_SetTime(&(RTC_TimeUsart.SetCfg));
-	}
-}
-
-/**************************************************************************************/
-/* Rtc_AlarmTriggered */
-/**************************************************************************************/
-static void Rtc_AlarmTriggered (void)
-{
-	/* Il RTC alarm A was triggered */
-	if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
-	{
-		/* Clear alarm flag */
-//		CLEAR_BIT(RTC->ISR, RTC_ISR_ALRAF);
-//		Activate buzzer!!!
 	}
 }
 

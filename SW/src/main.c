@@ -10,7 +10,6 @@
 #include "Gpio_Drv.h"
 #include "Gpio_Cfg.h"
 #include "Usart_Drv.h"
-#include "Interrupt_Drv.h"
 #include "AcquireInput.h"
 
 #include "LCDACM1602B.h"
@@ -28,8 +27,9 @@ int main(void)
 	result &= Clock_Drv_Init();	
 	
 	/* Timer initialization */
-	Timer_Drv_Init();
-		
+	Timer_Drv_Init(TIMERBASIC_7);
+	Timer_Drv_Int(TIMERBASIC_7);
+	
 	/* Rtc initialization */
 	RTC_Drv_Init();
 	
@@ -40,50 +40,38 @@ int main(void)
 	Gpio_Drv_Init();
 	
 	/* Usart Init */
-	result &= Usart_Drv_Init();
+	result &= Usart_Drv_Init(USART2_DBG_CMD);
 	
 	/* LCD Init */
 	LCDACM1602B_Drv_Init();
 
-	/* Interrupt Init */
-	Interrupt_Drv_Init();
-	
-	
+	/* PWM init */
+	Timer_Drv_Init(TIMEGENERAL_PWM_14);
 
+	/* Interrupt Init */
+	Rtc_Drv_AlarmInt();
+	Clock_Drv_SystickInt();
+	Usart_Drv_Int(USART2_DBG_CMD);
+
+	
 	
 	/*****************  TEST  **************************************/
 	Gpio_Drv_SetPin(LED_BLUE_PORT, LED_BLUE_PIN, HIGH);
 	Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
 	Gpio_Drv_SetPin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
 	
-//	MODIFY_REG(GPIOB->MODER, 0x03U << (8 * 2U), 0x01U << (8 * 2U));
-//	CLEAR_BIT(GPIOB->OTYPER, 0x01 << 8);
-//	CLEAR_BIT(GPIOB->PUPDR, 0x03U << (8 * 2U));
-//	
-//	Gpio_Drv_SetPin(GPIOB, 8, HIGH);
-//	Gpio_Drv_SetPin(GPIOB, 8, LOW);
-
 //	RTC_Drv_AlarmConfigure(&RTC_AlarmTime);
 //	RTC_Drv_AlarmEnable();
 
-	
 //	static uint8_t prova[10] = {3,4,5,6,7,8,9,1,2,3};
 ////	UsartData_InitTXint(USART2_DBG_CMD, prova, 10);
 //	UsartData_TXpoll(USART2_DBG_CMD, prova, 10);
 //	UsartString_TXpoll(USART2_DBG_CMD, "Greve zi!",10);
 	
-	
 	while(1)
-	{		
-		if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
-		{
-			Gpio_Drv_SetPin(GPIOB, 8, HIGH);
-			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
-			Delay_us(1000);
-			Gpio_Drv_SetPin(GPIOB, 8, LOW);
-			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, LOW);
-			Delay_us(1000);
-		}
+	{	
+//		static uint16_t duty = 500U;
+//		Timer_Drv_PwmSetDuty(TIMEGENERAL_PWM_14, duty);
 
 		AcquireInput();
 		
@@ -98,15 +86,9 @@ int main(void)
 
 
 	/* NEXT STEPS:
-
-	- Basic timer for delay in us
-	- pwm timer per buzzer
-
-	- configure a interrupt timer
 	- uart2 using HW CRC and DMA
 
-	- buzzer+LED with pwm (timer) sound/light when alarm clock or when ultrrasonic sensor
-	- potenziometer with ADC (use DMA?)
+	- potenziometer with ADC to tune the freqiuency of the alarm (use DMA?)
 	
 	- read Ultrasonic sensors (input capture?)
 	

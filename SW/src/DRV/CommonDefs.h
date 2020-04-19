@@ -9,7 +9,7 @@
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 typedef enum {
-	LOW = 0x00U,
+	LOW = 0x0U,
 	HIGH
 }LOGIC_STATE_t;
 

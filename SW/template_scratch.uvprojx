@@ -438,11 +438,6 @@
               <FilePath>.\src\DRV\STM32F746ZG\Gpio_Drv.c</FilePath>
             </File>
             <File>
-              <FileName>Interrupt_Drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\DRV\STM32F746ZG\Interrupt_Drv.c</FilePath>
-            </File>
-            <File>
               <FileName>LCDACM1602B_Drv.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\DRV\LCDACM1602B_Drv.c</FilePath>

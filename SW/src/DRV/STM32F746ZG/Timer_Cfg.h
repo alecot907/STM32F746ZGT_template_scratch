@@ -6,6 +6,22 @@
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #include "Timer_DrvDefs.h"
 
+
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+/* DEFINES */
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+
+/* Pin configuration */
+#define TIM14_PWM_PORT			((GPIO_TypeDef *) (GPIOF))
+#define TIM14_PWM_PIN				(0x9U)
+#define TIM14_PWM_MODE			((Gpio_Drv_Moder_t) GPIO_MODER_ALTFUNC)
+#define TIM14_PWM_OUTTYPE		((Gpio_Drv_Otyper_t) GPIO_OTYPER_PUSHPULL)
+#define TIM14_PWM_SPEEED		((Gpio_Drv_Ospeedr_t) GPIO_OSPEEDR_VERYHIGH)
+#define TIM14_PWM_PULLTYPE	((Gpio_Drv_Popdr_t) GPIO_POPDR_NO)
+#define TIM14_PWM_ALTFUNC		((Gpio_Drv_Afr_t) GPIO_AFR_9)
+
+
+
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -13,6 +29,7 @@
 typedef enum
 {
 	TIMERBASIC_7,
+	TIMEGENERAL_PWM_14,
 	
 	TIMERBASIC_NOF
 }TIMERBASIC_LIST_t;

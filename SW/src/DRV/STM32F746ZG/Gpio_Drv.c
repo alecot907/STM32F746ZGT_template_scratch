@@ -95,8 +95,8 @@ void Gpio_Drv_Init (void)
 		}
 		else
 		{
-			MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->AFR[1], 0x0FU << (Gpio_Drv_Regs[gpio_list].pin * 4U),
-							Gpio_Drv_Regs[gpio_list].alt_func << (Gpio_Drv_Regs[gpio_list].pin * 4U));
+			MODIFY_REG(Gpio_Drv_Regs[gpio_list].port->AFR[1], 0x0FU << ((Gpio_Drv_Regs[gpio_list].pin - 0x8U) * 4U),
+							Gpio_Drv_Regs[gpio_list].alt_func << ((Gpio_Drv_Regs[gpio_list].pin - 0x8U) * 4U));
 		}
 	}
 }

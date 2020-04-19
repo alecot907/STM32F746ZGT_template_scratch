@@ -48,102 +48,99 @@ static ErrorStatus UsartBaudCalc(USART_LIST_t usart_list, uint32_t *BaudReg, uin
 /**************************************************************************************/
 /* Usart_Drv_Init */
 /**************************************************************************************/
-ErrorStatus Usart_Drv_Init (void)
+ErrorStatus Usart_Drv_Init (USART_LIST_t usart_list)
 {
 	ErrorStatus result = SUCCESS;
 	uint32_t reg_temp;
 	uint8_t usart_number;
 	
-	for (USART_LIST_t usart_list = USART_LIST_START; usart_list < USART_LIST_TOTAL; usart_list++)
+	USART_TypeDef *port = Usart_Drv_Regs[usart_list].port;		
+	
+	/* Enable peripheral clock */
+	switch ((uint32_t) port)
 	{
-		USART_TypeDef *port = Usart_Drv_Regs[usart_list].port;		
-		
-		/* Enable peripheral clock */
-		switch ((uint32_t) port)
-		{
-			case USART1_BASE:
-				SET_BIT(RCC->APB2ENR, RCC_APB2ENR_USART1EN);
-				usart_number = 0x1U;
-				break;
-			case USART2_BASE:
-				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_USART2EN);
-				usart_number = 0x2U;
-				break;
-			case USART3_BASE:
-				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_USART3EN);
-				usart_number = 0x3U;
-				break;
-			case UART4_BASE:
-				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART4EN);
-				usart_number = 0x4U;
-				break;
-			case UART5_BASE:
-				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART5EN);
-				usart_number = 0x5U;
-				break;
-			case USART6_BASE:
-				SET_BIT(RCC->APB2ENR, RCC_APB2ENR_USART6EN);
-				usart_number = 0x6U;
-				break;
-			case UART7_BASE:
-				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART7EN);
-				usart_number = 0x7U;
-				break;
-			case UART8_BASE:
-				SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART7EN);
-				usart_number = 0x8U;
-				break;
-			default:
-				break;
-		}
-		
-		/* Clock source selection */
-		MODIFY_REG(RCC->DCKCFGR2, 0x03U << ((usart_number - 0x1U) * 0x2U),
-							Usart_Drv_Regs[usart_list].DCKCFGR2_ClockSelection << ((usart_number - 0x1U) * 0x2U));
-		
-		
-		/* Disable Peripheral */
-		CLEAR_BIT(Usart_Drv_Regs[usart_list].port->CR1, USART_CR1_UE);
-		
-		/* Configuration */
-		reg_temp = (((0x0U & 0x1U) << USART_CR1_M_Pos) | ((0x0U & 0x2U) << (28U - 1U))) | // 8 data bits hard coded
-								(Usart_Drv_Regs[usart_list].CR1_EndOfBlock_Interrupt << USART_CR1_EOBIE_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_Oversapling << USART_CR1_OVER8_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_CharMatch_Interrupt << USART_CR1_CMIE_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_ParityEnable << USART_CR1_PCE_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_ParityType << USART_CR1_PS_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_PE_Interrupt << USART_CR1_PEIE_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_TXEmpty_Interrupt << USART_CR1_TXEIE_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_TXComplete_Interrupt << USART_CR1_TCIE_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_RXNotEmpty_Interrupt << USART_CR1_RXNEIE_Pos) |
-								(Usart_Drv_Regs[usart_list].CR1_Idle_Interrupt << USART_CR1_IDLEIE_Pos) |
-								(1 << USART_CR1_TE_Pos) |
-								(1 << USART_CR1_RE_Pos);
-		MODIFY_REG(Usart_Drv_Regs[usart_list].port->CR1, 0xFFFFFFFF, reg_temp);
-		
-		reg_temp = (Usart_Drv_Regs[usart_list].CR2_MSBPosition << USART_CR2_MSBFIRST_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_BinaryDataInversion << USART_CR2_DATAINV_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_TXLevelInversion << USART_CR2_TXINV_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_RXLevelInversion << USART_CR2_RXINV_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_Swap_TX_RX << USART_CR2_SWAP_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_StopBits << USART_CR2_STOP_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_Clock << USART_CR2_CLKEN_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_ClockPolarity << USART_CR2_CPOL_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_ClockPhase << USART_CR2_CPHA_Pos) |
-								(Usart_Drv_Regs[usart_list].CR2_LastBitClockPulse << USART_CR2_LBCL_Pos);
-		MODIFY_REG(Usart_Drv_Regs[usart_list].port->CR2, 0xFFFFFFFF, reg_temp);
-		
-		/* Set baud rate */
-		result &= UsartBaudCalc(usart_list, &reg_temp, usart_number);
-		MODIFY_REG(Usart_Drv_Regs[usart_list].port->BRR, 0xFFFFFFFF, reg_temp);	
-		
-		/* Initialize final index of Obj (needed if you use usart TX on interrupt) */
-		UsartObj[usart_list].tx_EndIdx = MAX_BYTE_TXBUFF - 0x1U;
-		
-		/* Enable Peripheral */
-		SET_BIT(Usart_Drv_Regs[usart_list].port->CR1, USART_CR1_UE);
-	};
-		
+		case USART1_BASE:
+			SET_BIT(RCC->APB2ENR, RCC_APB2ENR_USART1EN);
+			usart_number = 0x1U;
+			break;
+		case USART2_BASE:
+			SET_BIT(RCC->APB1ENR, RCC_APB1ENR_USART2EN);
+			usart_number = 0x2U;
+			break;
+		case USART3_BASE:
+			SET_BIT(RCC->APB1ENR, RCC_APB1ENR_USART3EN);
+			usart_number = 0x3U;
+			break;
+		case UART4_BASE:
+			SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART4EN);
+			usart_number = 0x4U;
+			break;
+		case UART5_BASE:
+			SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART5EN);
+			usart_number = 0x5U;
+			break;
+		case USART6_BASE:
+			SET_BIT(RCC->APB2ENR, RCC_APB2ENR_USART6EN);
+			usart_number = 0x6U;
+			break;
+		case UART7_BASE:
+			SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART7EN);
+			usart_number = 0x7U;
+			break;
+		case UART8_BASE:
+			SET_BIT(RCC->APB1ENR, RCC_APB1ENR_UART7EN);
+			usart_number = 0x8U;
+			break;
+		default:
+			break;
+	}
+	
+	/* Clock source selection */
+	MODIFY_REG(RCC->DCKCFGR2, 0x03U << ((usart_number - 0x1U) * 0x2U),
+						Usart_Drv_Regs[usart_list].DCKCFGR2_ClockSelection << ((usart_number - 0x1U) * 0x2U));
+	
+	
+	/* Disable Peripheral */
+	CLEAR_BIT(Usart_Drv_Regs[usart_list].port->CR1, USART_CR1_UE);
+	
+	/* Configuration */
+	reg_temp = (((0x0U & 0x1U) << USART_CR1_M_Pos) | ((0x0U & 0x2U) << (28U - 1U))) | // 8 data bits hard coded
+							(Usart_Drv_Regs[usart_list].CR1_EndOfBlock_Interrupt << USART_CR1_EOBIE_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_Oversapling << USART_CR1_OVER8_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_CharMatch_Interrupt << USART_CR1_CMIE_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_ParityEnable << USART_CR1_PCE_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_ParityType << USART_CR1_PS_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_PE_Interrupt << USART_CR1_PEIE_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_TXEmpty_Interrupt << USART_CR1_TXEIE_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_TXComplete_Interrupt << USART_CR1_TCIE_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_RXNotEmpty_Interrupt << USART_CR1_RXNEIE_Pos) |
+							(Usart_Drv_Regs[usart_list].CR1_Idle_Interrupt << USART_CR1_IDLEIE_Pos) |
+							(1 << USART_CR1_TE_Pos) |
+							(1 << USART_CR1_RE_Pos);
+	MODIFY_REG(Usart_Drv_Regs[usart_list].port->CR1, 0xFFFFFFFF, reg_temp);
+	
+	reg_temp = (Usart_Drv_Regs[usart_list].CR2_MSBPosition << USART_CR2_MSBFIRST_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_BinaryDataInversion << USART_CR2_DATAINV_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_TXLevelInversion << USART_CR2_TXINV_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_RXLevelInversion << USART_CR2_RXINV_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_Swap_TX_RX << USART_CR2_SWAP_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_StopBits << USART_CR2_STOP_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_Clock << USART_CR2_CLKEN_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_ClockPolarity << USART_CR2_CPOL_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_ClockPhase << USART_CR2_CPHA_Pos) |
+							(Usart_Drv_Regs[usart_list].CR2_LastBitClockPulse << USART_CR2_LBCL_Pos);
+	MODIFY_REG(Usart_Drv_Regs[usart_list].port->CR2, 0xFFFFFFFF, reg_temp);
+	
+	/* Set baud rate */
+	result &= UsartBaudCalc(usart_list, &reg_temp, usart_number);
+	MODIFY_REG(Usart_Drv_Regs[usart_list].port->BRR, 0xFFFFFFFF, reg_temp);	
+	
+	/* Initialize final index of Obj (needed if you use usart TX on interrupt) */
+	UsartObj[usart_list].tx_EndIdx = MAX_BYTE_TXBUFF - 0x1U;
+	
+	/* Enable Peripheral */
+	SET_BIT(Usart_Drv_Regs[usart_list].port->CR1, USART_CR1_UE);
+	
 	return result;
 }
 
@@ -151,57 +148,54 @@ ErrorStatus Usart_Drv_Init (void)
 /**************************************************************************************/
 /* Usart_Drv_Int */
 /**************************************************************************************/
-void Usart_Drv_Int (void)
+void Usart_Drv_Int (USART_LIST_t usart_list)
 {
 	IRQn_Type 	Int_number;
 	uint32_t		Int_priority;
 	
-	for (USART_LIST_t usart_list = USART_LIST_START; usart_list < USART_LIST_TOTAL; usart_list++)
+	USART_TypeDef *port = Usart_Drv_Regs[usart_list].port;
+	
+	/* Enable peripheral clock */
+	switch ((uint32_t) port)
 	{
-		USART_TypeDef *port = Usart_Drv_Regs[usart_list].port;
-		
-		/* Enable peripheral clock */
-		switch ((uint32_t) port)
-		{
-			case USART1_BASE:
-				Int_number = USART1_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			case USART2_BASE:
-				Int_number = USART2_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			case USART3_BASE:
-				Int_number = USART3_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			case UART4_BASE:
-				Int_number = UART4_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			case UART5_BASE:
-				Int_number = UART5_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			case USART6_BASE:
-				Int_number = USART6_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			case UART7_BASE:
-				Int_number = UART7_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			case UART8_BASE:
-				Int_number = UART8_IRQn;
-				Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
-				break;
-			default:
-				break;
-		}
-		
-		NVIC_SetPriority (Int_number, (Int_priority << __NVIC_PRIO_BITS) - 1UL);
-		NVIC_EnableIRQ(Int_number);
+		case USART1_BASE:
+			Int_number = USART1_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		case USART2_BASE:
+			Int_number = USART2_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		case USART3_BASE:
+			Int_number = USART3_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		case UART4_BASE:
+			Int_number = UART4_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		case UART5_BASE:
+			Int_number = UART5_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		case USART6_BASE:
+			Int_number = USART6_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		case UART7_BASE:
+			Int_number = UART7_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		case UART8_BASE:
+			Int_number = UART8_IRQn;
+			Int_priority = Usart_Drv_Regs[usart_list].Int_priority;
+			break;
+		default:
+			break;
 	}
+	
+	NVIC_SetPriority (Int_number, (Int_priority << __NVIC_PRIO_BITS) - 1UL);
+	NVIC_EnableIRQ(Int_number);
 }
 
 /**************************************************************************************/

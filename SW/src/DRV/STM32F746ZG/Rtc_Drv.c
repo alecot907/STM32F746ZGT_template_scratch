@@ -181,7 +181,11 @@ void Rtc_Drv_AlarmInt (void)
 void RTC_Drv_AlarmConfigure (RTC_AlarmTime_t *alarmtime)
 {
 	uint32_t reg_temp;
-
+	uint32_t  alarm_state;
+	
+	/* Save Alarm A state */
+	alarm_state = READ_BIT(RTC->CR, RTC_CR_ALRAE);
+	
 	/* Disable the RTC registers write protection */
 	RTC_Drv_ProtectionDisable();
 	
@@ -207,6 +211,9 @@ void RTC_Drv_AlarmConfigure (RTC_AlarmTime_t *alarmtime)
 							(((uint32_t) alarmtime->Mask.Minute) << RTC_ALRMAR_MSK2_Pos) |
 							(((uint32_t) alarmtime->Mask.Second) << RTC_ALRMAR_MSK1_Pos);
 	WRITE_REG(RTC->ALRMAR, reg_temp);
+		
+	/* Reset alarm to previous state */
+	MODIFY_REG(RTC->CR, RTC_CR_ALRAE, alarm_state);
 		
 	/* Enable the RTC registers write protection */
 	RTC_Drv_ProtectionEnable();

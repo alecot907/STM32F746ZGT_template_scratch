@@ -14,7 +14,7 @@
 
 const char RTC_DaysString[8U][5U] = {"NAD\0", "MON\0", "TUE\0", "WED\0", "THU\0", "FRI\0", "SAT\0", "SUN\0"};
 					
-RTC_Time_t RTC_TimeDefault = {00U, 01U, 01U, MONDAY,
+RTC_Time_t RTC_TimeDefault = {00U, 01U, MONDAY, 01U, 
 															00U, 00U, 00U};
 
 
@@ -196,14 +196,14 @@ void RTC_Drv_AlarmConfigure (RTC_AlarmTime_t *alarmtime)
 	while(!READ_BIT(RTC->ISR, RTC_ISR_ALRAWF));
 	
 	/* Configure the alarm */
-	reg_temp = 	(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.DayOrDate)) >> 4U)) << RTC_ALRMAR_DT_Pos) |
-							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.DayOrDate)) & 0xFU)) << RTC_ALRMAR_DU_Pos) |
+	reg_temp = 	(((((uint32_t) 0U) >> 4U)) << RTC_ALRMAR_DT_Pos) |
+							(((((uint32_t) 0U) & 0xFU)) << RTC_ALRMAR_DU_Pos) |
 							(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.Hour)) >> 4U)) << RTC_ALRMAR_HT_Pos) |
 							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.Hour)) & 0xFU)) << RTC_ALRMAR_HU_Pos) |
 							(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.Minute)) >> 4U)) << RTC_ALRMAR_MNT_Pos) |
 							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.Minute)) & 0xFU)) << RTC_ALRMAR_MNU_Pos) |
-							(((((uint32_t) RTC_Drv_ByteToBcd2(alarmtime->Value.Second)) >> 4U)) << RTC_ALRMAR_ST_Pos) |
-							(((((uint32_t)RTC_Drv_ByteToBcd2(alarmtime->Value.Second)) & 0xFU)) << RTC_ALRMAR_SU_Pos);
+							(((((uint32_t) 0U) >> 4U)) << RTC_ALRMAR_ST_Pos) |
+							(((((uint32_t) 0U) & 0xFU)) << RTC_ALRMAR_SU_Pos);
 	reg_temp |= (RTC_TR_PM_CFG << RTC_TR_PM_Pos) 	| 
 							(((uint32_t) alarmtime->Mask.DayOrDate) << RTC_ALRMAR_MSK4_Pos) |
 							(((uint32_t) alarmtime->Mask.DayOrDateSelection) << RTC_ALRMAR_WDSEL_Pos) |

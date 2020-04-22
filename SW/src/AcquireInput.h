@@ -15,7 +15,7 @@
 /* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #define INPUT_RAWPOS 			(31U)
-#define INPUT_MASK_INV 	(0x7FFFFFFF)
+#define INPUT_MASK_INV 		(0x7FFFFFFF)
 
 #define INPUT_QUAL(X)			(X & 0x1U)
 #define INPUT_NOTQUAL(X)	(X >> INPUT_RAWPOS)

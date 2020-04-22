@@ -467,6 +467,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\DRV\STM32F746ZG\Usart_Drv.c</FilePath>
             </File>
+            <File>
+              <FileName>CRC_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\CRC_Drv.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

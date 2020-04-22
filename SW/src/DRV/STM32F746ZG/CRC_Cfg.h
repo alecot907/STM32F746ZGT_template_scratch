@@ -1,42 +1,35 @@
-#ifndef __SYSDATA_H
-#define __SYSDATA_H
+#ifndef __CRC_CFG_H
+#define __CRC_CFG_H
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-#include <stdint.h>
+#include "CRC_DrvDefs.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-typedef enum 
-{
-	SYS_IN_BUTTONUSR = 0,
-	
-	SYS_IN_NOF
-} SYSDATA_IN_t;
-
-typedef enum 
-{
-	
-	SYS_LOGIC_NOF
-} SYSDATA_LOGIC_t;
+ 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+#define CRC_CR_REVOUT_CFG			((CRC_CR_REVOUT_t) CRC_CR_REVOUT_STD)
+#define CRC_CR_REVIN_CFG			((CRC_CR_REVIN_t) CRC_CR_REVIN_STD)
+#define CRC_CR_POLYSIZE_CFG		((CRC_CR_POLYSIZE_t) CRC_CR_POLYSIZE_32)
+
+#define CRC_INIT_POLY_CFG			(0xFFFFFFFFU)
+#define CRC_POL_POLY_CFG			(0x04C11DB7U)
+
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PUBLIC FUNCTIONS */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* EXTERN VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-extern uint32_t SysData_In		[SYS_IN_NOF];
-extern uint32_t SysData_Logic	[SYS_LOGIC_NOF];
 
 
-#endif /* __SYSDATA_H */
+#endif /* __CRC_CFG_H */

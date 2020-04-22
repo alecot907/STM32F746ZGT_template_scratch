@@ -6,30 +6,37 @@
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #include "stm32f7xx.h"
 #include "Rtc_Drv.h"
+#include "Usart.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-typedef struct 
-{
-	uint8_t 		IDS;
-	RTC_Time_t 	SetCfg;
-	uint8_t 		CRC8;
-} RTC_TimeUsart_t;
 
 typedef struct 
 {
-	uint8_t 					IDS;
-	RTC_AlarmTime_t 	SetAlarmCfg;
-	uint8_t 					CRC8;
-} RTC_AlarmTimeValueUart_t;
-
-typedef enum
+	RX_PACKET_ID_t 		ID;
+	uint8_t 					Length;
+	RTC_Time_t 				SetCfg;
+	uint32_t 					CRC32;
+}__attribute__ ((__packed__)) RTC_TimeUsart_t;
+typedef union
 {
-	RTC_IDS_USART_TIMEDATE 	= 0x01U,
-	RTC_IDS_USART_ALARM
-	
-} RTC_IDS_USART_t;
+	RTC_TimeUsart_t 	structure;
+	uint8_t 					bytes[9U];
+}__attribute__ ((__packed__)) RTC_TimeUsartUnion_t;
+
+typedef struct 
+{
+	RX_PACKET_ID_t				ID;
+	uint8_t 							Length;
+	RTC_AlarmTimeValue_t 	SetAlarmCfg;
+	uint32_t 							CRC32;
+}__attribute__ ((__packed__)) RTC_AlarmTimeValueUsart_t;
+typedef union
+{
+	RTC_AlarmTimeValueUsart_t 	structure;
+	uint8_t 										bytes[5U];
+}__attribute__ ((__packed__)) RTC_AlarmTimeValueUsartUnion_t;
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -46,9 +53,13 @@ void Rtc_Mng (void);
 /* EXTERN VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-extern RTC_Time_t 							RTC_Time;
-extern RTC_AlarmTime_t 					RTC_AlarmTime; // day, hour, min, sec
-extern RTC_TimeUsart_t 					RTC_TimeUsart;
-extern RTC_AlarmTimeValueUart_t	RTC_AlarmTimeValueUart;
+extern RTC_Time_t 								RTC_Time;
+extern RTC_AlarmTime_t 						RTC_AlarmTime; // day, hour, min, sec
+//extern RTC_TimeUsart_t 						RTC_TimeUsart;
+//extern RTC_AlarmTimeValueUsart_t	RTC_AlarmTimeValueUart;
+extern RTC_TimeUsartUnion_t 					RTC_TimeUsart;
+extern RTC_AlarmTimeValueUsartUnion_t	RTC_AlarmTimeValueUart;
+
+
 
 #endif /* __RTC_H */

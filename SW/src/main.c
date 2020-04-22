@@ -3,6 +3,7 @@
 
 #include "ChipInfo.h"
 #include "Clock_Drv.h"
+#include "CRC_Drv.h"
 #include "Timer_Drv.h"
 #include "Timer_Cfg.h"
 #include "Rtc_Drv.h"
@@ -26,6 +27,9 @@ int main(void)
 	/* Clock initialization */
 	result &= Clock_Drv_Init();	
 	
+	/* CRC initialization */
+	CRC_Drv_Init();
+	
 	/* Timer initialization */
 	Timer_Drv_Init(TIMERBASIC_7);
 	Timer_Drv_Int(TIMERBASIC_7);
@@ -46,7 +50,7 @@ int main(void)
 	LCDACM1602B_Drv_Init();
 
 	/* PWM init */
-	Timer_Drv_Init(TIMEGENERAL_PWM_14);
+	Timer_Drv_Init(TIMEGENERAL_14_PWM);
 
 	/* Interrupt Init */
 	Rtc_Drv_AlarmInt();
@@ -55,9 +59,10 @@ int main(void)
 
 	
 	
+	
+	
 	/*****************  TEST  **************************************/
 	Gpio_Drv_SetPin(LED_BLUE_PORT, LED_BLUE_PIN, HIGH);
-	Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
 	Gpio_Drv_SetPin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
 	
 //	RTC_Drv_AlarmConfigure(&RTC_AlarmTime);
@@ -68,11 +73,23 @@ int main(void)
 //	UsartData_TXpoll(USART2_DBG_CMD, prova, 10);
 //	UsartString_TXpoll(USART2_DBG_CMD, "Greve zi!",10);
 	
+	
+//	static uint32_t crc_test;
+//	static uint32_t data32[4] = {0x00002222, 0x00002225, 0x00002224, 0x00002223};
+//	static uint16_t data16[5] = {0x2222, 0x2225, 0x2224, 0x2223, 0x2228};
+//	static uint8_t data8[7] = {0x22, 0x25, 0x24, 0x23, 0x56, 0x34, 0x3A};
+//	crc_test = CRC_Drv_Compute(data32, sizeof(data32), CRC_COMPUTE_TYPE_32);
+//	crc_test = CRC_Drv_Compute((uint32_t *)data16, sizeof(data16), CRC_COMPUTE_TYPE_16);
+//	crc_test = CRC_Drv_Compute((uint32_t *)data8, sizeof(data8), CRC_COMPUTE_TYPE_8);
+
+	
 	while(1)
 	{	
-//		static uint16_t duty = 500U;
-//		Timer_Drv_PwmSetDuty(TIMEGENERAL_PWM_14, duty);
-
+		if (ERROR == result)
+		{
+			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
+		}
+		
 		AcquireInput();
 		
 		Rtc_Mng();
@@ -86,8 +103,6 @@ int main(void)
 
 
 	/* NEXT STEPS:
-	- uart2 using HW CRC and DMA
-
 	- potenziometer with ADC to tune the freqiuency of the alarm (use DMA?)
 	
 	- read Ultrasonic sensors (input capture?)

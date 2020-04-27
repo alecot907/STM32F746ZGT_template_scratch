@@ -6,7 +6,8 @@
 
 #include "Rtc.h"
 #include "Clock_Drv.h"
-
+#include "Usart_Drv.h"
+#include "SysData.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
@@ -75,6 +76,9 @@ void LCDACM1602B_Mng (void)
 				LCDACM1602B_Drv_SendString(ROW_2, 10, "%c%02d:%02d", Alarm_char, RTC_AlarmTime.Value.Hour, RTC_AlarmTime.Value.Minute);
 				
 				LCDACM1602B_Obj.state = LCDACM1602B_STATE_WAIT;
+				
+				
+				UsartString_TXpoll(USART2_DBG_CMD, "Alarm freq: %d\n", (uint16_t) SysData_Eng[SYS_ENG_POTENTIOMETER_FREQ]);
 			}
 			break;
 		default:

@@ -36,6 +36,8 @@ int main(void)
 	Timer_Drv_Init(TIMERBASIC_7_DELAYUS);
 	Timer_Drv_Int(TIMERBASIC_7_DELAYUS);
 	
+	Timer_Drv_Init(TIMERBASIC_6_ADC1TRIG);
+
 	/* Rtc initialization */
 	RTC_Drv_Init();
 	
@@ -44,12 +46,12 @@ int main(void)
 	
 	/* Gpio Init */
 	Gpio_Drv_Init();
+
+	/* Adc Init */
+	Adc_Drv_Init(ADC_LIST_1);
 	
 	/* Dma Init */
 	Dma_Drv_Init(DMA_LIST_ADC_DMA2CH0);
-	
-	/* Adc Init */
-	Adc_Drv_Init(ADC_LIST_1);
 	
 	/* Usart Init */
 	result &= Usart_Drv_Init(USART2_DBG_CMD);
@@ -66,27 +68,21 @@ int main(void)
 	Usart_Drv_Int(USART2_DBG_CMD);
 	Dma_Drv_Int(DMA_LIST_ADC_DMA2CH0);
 	Adc_Drv_Int(ADC_LIST_1);
-	
+	Timer_Drv_Int(TIMERBASIC_6_ADC1TRIG);
 	
 	/* Start peripherals */
 	Dma_Drv_Start(DMA_LIST_ADC_DMA2CH0);
 	Adc_Drv_Start(ADC_LIST_1);
+	Timer_Drv_Start(TIMERBASIC_6_ADC1TRIG);
 	
 	
-
 	
-		
-
+	
 	
 	
 	
 	/*****************  TEST  **************************************/
-	
-//	Timer_Drv_Init(TIMERBASIC_6_ADC1TRIG);
-//	Timer_Drv_Int(TIMERBASIC_6_ADC1TRIG);
-//	Timer_Drv_Start(TIMERBASIC_6_ADC1TRIG);
-
-	
+		
 	Gpio_Drv_SetPin(LED_BLUE_PORT, LED_BLUE_PIN, HIGH);
 	Gpio_Drv_SetPin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
 	
@@ -107,6 +103,8 @@ int main(void)
 //	crc_test = CRC_Drv_Compute((uint32_t *)data16, sizeof(data16), CRC_COMPUTE_TYPE_16);
 //	crc_test = CRC_Drv_Compute((uint32_t *)data8, sizeof(data8), CRC_COMPUTE_TYPE_8);
 
+
+
 	
 	while(1)
 	{
@@ -115,7 +113,7 @@ int main(void)
 			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
 		}
 		
-		AcquireInput();
+		/* AcquireInput managed in the interrupt handling of DMA */
 		
 		Rtc_Mng();
 		
@@ -127,9 +125,7 @@ int main(void)
 
 
 
-	/* NEXT STEPS:
-	- potenziometer with ADC to tune the freqiuency of the alarm (use DMA?)
-	
+	/* NEXT STEPS:	
 	- read Ultrasonic sensors (input capture?)
 	
 	- accelerometer (SPI, I2C with DMA?)

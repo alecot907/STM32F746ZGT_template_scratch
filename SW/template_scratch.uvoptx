@@ -125,7 +125,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGTARM</Key>
-          <Name>(1010=59,26,509,583,0)(6017=634,160,823,496,0)(1008=88,165,464,401,0)(6016=-1,-1,-1,-1,0)(1012=1082,201,1559,516,0)</Name>
+          <Name>(1010=1991,843,2441,1400,1)(6017=634,160,823,496,0)(1008=88,165,464,401,0)(6016=-1,-1,-1,-1,0)(1012=1082,201,1559,516,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -210,6 +210,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>SysData_In</ItemText>
         </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>SysData_Eng[0],0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>13</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>reg_set,0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
@@ -271,7 +281,7 @@
           <WinId>35905</WinId>
         </Entry>
         <Entry>
-          <Name>System Viewer\EXTI</Name>
+          <Name>System Viewer\TIM14</Name>
           <WinId>35904</WinId>
         </Entry>
         <Entry>

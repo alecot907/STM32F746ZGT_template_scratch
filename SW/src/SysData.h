@@ -25,6 +25,15 @@ typedef enum
 	SYS_LOGIC_NOF
 } SYSDATA_LOGIC_t;
 
+typedef enum 
+{
+	SYS_ENG_POTENTIOMETER_FREQ,
+	
+	SYS_ENG_NOF
+} SYSDATA_ENG_t;
+
+
+
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -39,6 +48,7 @@ typedef enum
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 extern uint32_t SysData_In		[SYS_IN_NOF];
 extern uint32_t SysData_Logic	[SYS_LOGIC_NOF];
+extern float SysData_Eng		[SYS_ENG_NOF];
 
 
 #endif /* __SYSDATA_H */

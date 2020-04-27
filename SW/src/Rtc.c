@@ -6,8 +6,10 @@
 #include "CommonDefs.h"
 #include "Timer_Drv.h"
 #include "CRC_Drv.h"
+#include "Usart_Drv.h"
 
 #include <string.h>
+#include <stdint.h>
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -53,6 +55,10 @@ static void Rtc_AlarmCfg (void);
 /**************************************************************************************/
 static void Rtc_AlarmMng (void);
 
+/**************************************************************************************/
+/* Rtc_AlarmFreqCfg */
+/**************************************************************************************/
+static void Rtc_AlarmFreqCfg(void);
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -64,6 +70,8 @@ static void Rtc_AlarmMng (void);
 /**************************************************************************************/
 void Rtc_Mng (void)
 {
+	Rtc_AlarmFreqCfg();
+	
 	Rtc_AlarmCfg();
 	
 	Rtc_TimeDateCfg();
@@ -76,12 +84,14 @@ void Rtc_Mng (void)
 /**************************************************************************************/
 static void Rtc_AlarmMng (void)
 {
+	uint32_t button_current = SysData_In[SYS_IN_BUTTONUSR];
+
 	/* Button check */
-	if ((HIGH == INPUT_QUAL(SysData_In[SYS_IN_BUTTONUSR])) && (LOW == button_old))
+	if ((HIGH == INPUT_QUAL(button_current)) && (LOW == button_old))
 	{
 		alarm_state = (LOGIC_STATE_t) (!alarm_state);
 	}
-	button_old = INPUT_QUAL(SysData_In[SYS_IN_BUTTONUSR]);
+	button_old = INPUT_QUAL(button_current);
 	
 	
 	/* Alarm state check */
@@ -105,7 +115,7 @@ static void Rtc_AlarmMng (void)
 	alarm_state_old = alarm_state;
 	
 	
-	/* Il RTC alarm A was triggered */
+	/* If RTC alarm A was triggered */
 	if (READ_BIT(RTC->ISR, RTC_ISR_ALRAF) & RTC_ISR_ALRAF)
 	{		
 		/* Activate alarm speaker */
@@ -156,4 +166,33 @@ static void Rtc_TimeDateCfg (void)
 		RTC_TimeUsart.structure.ID = RX_PACKET_ID_DEF_DEFAULT;
 	}
 }
+
+
+/**************************************************************************************/
+/* Rtc_AlarmFreqCfg */
+/**************************************************************************************/
+static void Rtc_AlarmFreqCfg(void)
+{
+	uint32_t potentiometer_current = SysData_In[SYS_IN_POTENTIOMETER];
+	uint32_t reg_set;
+	
+	SysData_Eng[SYS_ENG_POTENTIOMETER_FREQ] = (20000.0 - 20.0)/4095.0 * potentiometer_current + 20;
+	
+	reg_set = SystemCoreClock / SysData_Eng[SYS_ENG_POTENTIOMETER_FREQ];
+	
+	if (reg_set <= UINT16_MAX)
+	{
+		MODIFY_REG(Timer_Drv_Regs[TIMEGENERAL_14_PWM].timer->PSC, 0xFFFF, 1U - 0x1U);
+		MODIFY_REG(Timer_Drv_Regs[TIMEGENERAL_14_PWM].timer->ARR, 0xFFFF, reg_set - 0x1U);
+	}
+	else
+	{
+		MODIFY_REG(Timer_Drv_Regs[TIMEGENERAL_14_PWM].timer->ARR, 0xFFFF, 100U - 0x1U);
+		MODIFY_REG(Timer_Drv_Regs[TIMEGENERAL_14_PWM].timer->PSC, 0xFFFF, reg_set/100 - 0x1U);
+	}
+}
+
+
+
+
 

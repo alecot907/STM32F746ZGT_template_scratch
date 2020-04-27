@@ -5,6 +5,7 @@
 #include "stm32f7xx.h"
 #include "Timer_Cfg.h"
 #include "Timer_Drv.h"
+#include "Adc_Drv.h"
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -76,32 +77,32 @@ const Timer_Drv_Regs_t Timer_Drv_Regs[TIMER_LIST_TOTAL] =
 		TIMER_ENABLE
 	},
 	
-//	{
-//		TIM6,
-//		4U,
-//		TIMER_ENABLE,
-//		300,  // 50 Hz
-//		4800,
-//		
-//		TIMER_ENABLE,
-//		TIMER_ENABLE,
-//		TIMER_DISABLE,
-//		TIMER_UNDER_OVER_FLOW,
-//		TIMER_DISABLE,
-//		
-//		TIMER_MASTER_MODE_UPDATE,
-//		
-//		TIMER_ENABLE,
-//		TIMER_DISABLE,
-//		
-//		TIMER_CAPT_COMP_OUT,
-//		TIMER_OUT_COMP_FROZEN,
-//		TIMER_DISABLE,
-//		TIMER_DISABLE,
-//		
-//		TIMER_CAPT_COMP_OUTPOL_ACTHIGH,
-//		TIMER_DISABLE
-//	}
+	{
+		TIM6,
+		4U,
+		TIMER_ENABLE,
+		150,  // 100 Hz
+		4800,
+		
+		TIMER_ENABLE,
+		TIMER_ENABLE,
+		TIMER_DISABLE,
+		TIMER_UNDER_OVER_FLOW,
+		TIMER_DISABLE,
+		
+		TIMER_MASTER_MODE_UPDATE,
+		
+		TIMER_ENABLE,
+		TIMER_ENABLE,
+		
+		TIMER_CAPT_COMP_OUT,
+		TIMER_OUT_COMP_FROZEN,
+		TIMER_DISABLE,
+		TIMER_DISABLE,
+		
+		TIMER_CAPT_COMP_OUTPOL_ACTHIGH,
+		TIMER_DISABLE
+	}
 };
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -144,10 +145,15 @@ void Delay_us (uint32_t delay)
 }
 
 
+
 /**************************************************************************************/
 /* TIM6_DAC_IRQHandler */
 /**************************************************************************************/
 void TIM6_DAC_IRQHandler (void)
 {
 	CLEAR_BIT(TIM6->SR, TIM_SR_UIF);
+	
+	/* TODO I want to disable this interupt and trigger a start of
+	ocnversion automatically using TRGO of timer. DOESN'T WORK?!?!? */
+	Adc_Drv_Start(ADC_LIST_1);
 }

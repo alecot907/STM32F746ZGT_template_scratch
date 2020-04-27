@@ -4,6 +4,7 @@
 #include "Dma_Cfg.h"
 #include <string.h>
 #include "Adc_Cfg.h"
+#include "AcquireInput.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
@@ -37,7 +38,7 @@ const Dma_Drv_Regs_t Dma_Drv_Regs[DMA_LIST_TOTAL] =
 		DMA_ENABLED,                       //SxCR_CircularMode;
 		DMA_DATA_TRANS_DIR_P2M,                  //SxCR_DataTransDirection;
 		DMA_PERIPH_FLOW_CONTR_DMA,               //SxCR_PeriphFlowController;
-		DMA_DISABLED,                       //SxCR_TransComplete_Interrupt;
+		DMA_ENABLED,                       //SxCR_TransComplete_Interrupt;
 		DMA_DISABLED,                            //SxCR_TransHalf_Interrupt;
 		DMA_DISABLED,                            //SxCR_TransError_Interrupt;
 		DMA_DISABLED,                            //SxCR_DirectModeError_Interrupt;
@@ -67,9 +68,15 @@ const Dma_Drv_Regs_t Dma_Drv_Regs[DMA_LIST_TOTAL] =
 /**************************************************************************************/
 void DMA2_Stream0_IRQHandler (void)
 {
+	/* Transfer complete */
 	if (READ_BIT(DMA2->LISR, DMA_LISR_TCIF0))
 	{
 		SET_BIT(DMA2->LIFCR, DMA_LIFCR_CTCIF0);
 		READ_REG(ADC1->DR);
+		
+		AcquireInput();
 	}
 }
+
+
+

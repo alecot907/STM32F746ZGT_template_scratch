@@ -49,7 +49,6 @@ typedef enum
 	USART_NOF
 }USART_LIST_t;
 
-#define USART_LIST_START (USART2_DBG_CMD)
 #define USART_LIST_TOTAL (USART_NOF)
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/

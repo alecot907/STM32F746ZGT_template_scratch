@@ -1,65 +1,53 @@
-#ifndef __TIMER_CFG_H
-#define __TIMER_CFG_H
+#ifndef __ADC_DRV_H
+#define __ADC_DRV_H
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-#include "Timer_DrvDefs.h"
-
-
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-/* DEFINES */
-/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-
-/* Pin configuration */
-#define TIM14_PWM_PORT			((GPIO_TypeDef *) (GPIOF))
-#define TIM14_PWM_PIN				(0x9U)
-#define TIM14_PWM_MODE			((Gpio_Drv_Moder_t) GPIO_MODER_ALTFUNC)
-#define TIM14_PWM_OUTTYPE		((Gpio_Drv_Otyper_t) GPIO_OTYPER_PUSHPULL)
-#define TIM14_PWM_SPEEED		((Gpio_Drv_Ospeedr_t) GPIO_OSPEEDR_VERYHIGH)
-#define TIM14_PWM_PULLTYPE	((Gpio_Drv_Popdr_t) GPIO_POPDR_NO)
-#define TIM14_PWM_ALTFUNC		((Gpio_Drv_Afr_t) GPIO_AFR_9)
-
-
+#include "Adc_Cfg.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-typedef enum
-{
-	TIMERBASIC_7_DELAYUS,
-	TIMEGENERAL_14_PWM,
-//	TIMERBASIC_6_ADC1TRIG,
-	
-	TIMER_NOF
-}TIMER_LIST_t;
-
-#define TIMER_LIST_TOTAL	(TIMER_NOF)
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+/* DEFINES */
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* PUBLIC FUNCTIONS */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
 /**************************************************************************************/
-/* TIM7_IRQHandler */
+/* Adc_Drv_Init */
 /**************************************************************************************/
-void TIM7_IRQHandler (void);
+void Adc_Drv_Init (ADC_LIST_t adc_list);
 
 /**************************************************************************************/
-/* Delay_us */
+/* Adc_Drv_Start */
 /**************************************************************************************/
-void Delay_us (uint32_t delay);
+void Adc_Drv_Start (ADC_LIST_t adc_list);
 
 /**************************************************************************************/
-/* TIM6_DAC_IRQHandler */
+/* Adc_Drv_Stop */
 /**************************************************************************************/
-void TIM6_DAC_IRQHandler (void);
+void Adc_Drv_Stop (ADC_LIST_t adc_list);
+
+/**************************************************************************************/
+/* Adc_Drv_Int */
+/**************************************************************************************/
+void Adc_Drv_Int (ADC_LIST_t adc_list);
+
+
+/**************************************************************************************/
+/* Adc_Drv_Read */
+/**************************************************************************************/
+uint16_t Adc_Drv_Read (ADC_LIST_t adc_list, ADC_CHAN_NUMB_SEQ_t channel);
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* EXTERN VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-extern const Timer_Drv_Regs_t Timer_Drv_Regs[TIMER_LIST_TOTAL];
 
-#endif /* __TIMER_CFG_H */
+
+#endif /* __ADC_DRV_H */

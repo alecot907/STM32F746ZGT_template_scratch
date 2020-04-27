@@ -101,7 +101,7 @@ ErrorStatus Usart_Drv_Init (USART_LIST_t usart_list)
 	
 	
 	/* Disable Peripheral */
-	CLEAR_BIT(Usart_Drv_Regs[usart_list].port->CR1, USART_CR1_UE);
+	CLEAR_BIT(port->CR1, USART_CR1_UE);
 	
 	/* Configuration */
 	reg_temp = (((0x0U & 0x1U) << USART_CR1_M_Pos) | ((0x0U & 0x2U) << (28U - 1U))) | // 8 data bits hard coded
@@ -117,7 +117,7 @@ ErrorStatus Usart_Drv_Init (USART_LIST_t usart_list)
 							(Usart_Drv_Regs[usart_list].CR1_Idle_Interrupt << USART_CR1_IDLEIE_Pos) |
 							(1 << USART_CR1_TE_Pos) |
 							(1 << USART_CR1_RE_Pos);
-	MODIFY_REG(Usart_Drv_Regs[usart_list].port->CR1, 0xFFFFFFFF, reg_temp);
+	MODIFY_REG(port->CR1, 0xFFFFFFFF, reg_temp);
 	
 	reg_temp = (Usart_Drv_Regs[usart_list].CR2_MSBPosition << USART_CR2_MSBFIRST_Pos) |
 							(Usart_Drv_Regs[usart_list].CR2_BinaryDataInversion << USART_CR2_DATAINV_Pos) |
@@ -129,17 +129,17 @@ ErrorStatus Usart_Drv_Init (USART_LIST_t usart_list)
 							(Usart_Drv_Regs[usart_list].CR2_ClockPolarity << USART_CR2_CPOL_Pos) |
 							(Usart_Drv_Regs[usart_list].CR2_ClockPhase << USART_CR2_CPHA_Pos) |
 							(Usart_Drv_Regs[usart_list].CR2_LastBitClockPulse << USART_CR2_LBCL_Pos);
-	MODIFY_REG(Usart_Drv_Regs[usart_list].port->CR2, 0xFFFFFFFF, reg_temp);
+	MODIFY_REG(port->CR2, 0xFFFFFFFF, reg_temp);
 	
 	/* Set baud rate */
 	result &= UsartBaudCalc(usart_list, &reg_temp, usart_number);
-	MODIFY_REG(Usart_Drv_Regs[usart_list].port->BRR, 0xFFFFFFFF, reg_temp);	
+	MODIFY_REG(port->BRR, 0xFFFFFFFF, reg_temp);	
 	
 	/* Initialize final index of Obj (needed if you use usart TX on interrupt) */
 	UsartObj[usart_list].tx_EndIdx = MAX_BYTE_TXBUFF - 0x1U;
 	
 	/* Enable Peripheral */
-	SET_BIT(Usart_Drv_Regs[usart_list].port->CR1, USART_CR1_UE);
+	SET_BIT(port->CR1, USART_CR1_UE);
 	
 	return result;
 }

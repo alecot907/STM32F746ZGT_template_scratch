@@ -1,29 +1,23 @@
-#ifndef __SYSDATA_H
-#define __SYSDATA_H
+#ifndef __DMA_CFG_H
+#define __DMA_CFG_H
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-#include <stdint.h>
+#include "Dma_DrvDefs.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
-typedef enum 
+typedef enum
 {
-	SYS_IN_BUTTONUSR = 0,
-	SYS_IN_POTENTIOMETER,
-	SYS_IN_LIGHT_SENSOR,
+	DMA_LIST_ADC_DMA2CH0 = 0x0U,
 	
-	SYS_IN_NOF
-} SYSDATA_IN_t;
+	DMA_LIST_NOF
+}DMA_LIST_t;
 
-typedef enum 
-{
-	
-	SYS_LOGIC_NOF
-} SYSDATA_LOGIC_t;
+#define DMA_LIST_TOTAL (DMA_LIST_NOF)
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -33,12 +27,16 @@ typedef enum
 /* PUBLIC FUNCTIONS */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
+/**************************************************************************************/
+/* DMA2_Stream0_IRQHandler */
+/**************************************************************************************/
+void DMA2_Stream0_IRQHandler (void);
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* EXTERN VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-extern uint32_t SysData_In		[SYS_IN_NOF];
-extern uint32_t SysData_Logic	[SYS_LOGIC_NOF];
+
+extern const Dma_Drv_Regs_t Dma_Drv_Regs[DMA_LIST_TOTAL];
 
 
-#endif /* __SYSDATA_H */
+#endif /* __DMA_CFG_H */

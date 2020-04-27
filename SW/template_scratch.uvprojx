@@ -472,6 +472,26 @@
               <FileType>1</FileType>
               <FilePath>.\src\DRV\STM32F746ZG\CRC_Drv.c</FilePath>
             </File>
+            <File>
+              <FileName>Adc_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Adc_Cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>Adc_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Adc_Drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>Dma_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Dma_Cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>Dma_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Dma_Drv.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

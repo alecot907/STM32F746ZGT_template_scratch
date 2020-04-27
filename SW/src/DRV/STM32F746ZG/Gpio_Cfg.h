@@ -30,6 +30,9 @@ typedef enum
 	
 	GPIO_TIM14_PWM,
 	
+	GPIO_ADC_POT,
+	GPIO_LIGHT_POT,
+	
 	GPIO_NOF
 }GPIO_LIST_t;
 

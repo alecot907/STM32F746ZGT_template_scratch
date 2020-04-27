@@ -104,3 +104,13 @@ STM32CubeMX/Src/stm32f7xx_hal_msp.c
 STM32CubeMX/Src/stm32f7xx_it.c
 STM32CubeMX/Src/system_stm32f7xx.c
 STM32CubeMX/STM32CubeMX.ioc
+STM32CubeMX/Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_adc.h
+STM32CubeMX/Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_adc_ex.h
+STM32CubeMX/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc.c
+STM32CubeMX/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc_ex.c
+STM32CubeMX/TrueSTUDIO/startup_stm32f746xx.s
+STM32CubeMX/TrueSTUDIO/STM32CubeMX/.cproject
+STM32CubeMX/TrueSTUDIO/STM32CubeMX/.project
+STM32CubeMX/TrueSTUDIO/STM32CubeMX/.settings/com.atollic.truestudio.debug.hardware_device.prefs
+STM32CubeMX/TrueSTUDIO/STM32CubeMX/STM32CubeMX.elf.launch
+STM32CubeMX/TrueSTUDIO/syscalls.c

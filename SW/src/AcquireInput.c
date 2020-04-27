@@ -5,6 +5,7 @@
 
 #include "Gpio_Drv.h"
 #include "Gpio_Cfg.h"
+#include "Adc_Cfg.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -37,6 +38,9 @@ void AcquireInput (void)
 	/* Input acquisition */
 	SysData_In[SYS_IN_BUTTONUSR] = (SysData_In[SYS_IN_BUTTONUSR] & INPUT_MASK_INV) | 
 																	(Gpio_Drv_GetPin(BUTTONUSR_PORT, BUTTONUSR_PIN) << INPUT_RAWPOS);
+	
+	SysData_In[SYS_IN_POTENTIOMETER] = ADC1_DMA_Samples[0];
+	SysData_In[SYS_IN_LIGHT_SENSOR] = ADC1_DMA_Samples[1];
 	
 	/* Input qualification */
 	QualifyInput(SYS_IN_BUTTONUSR, 5U);

@@ -87,7 +87,7 @@ typedef struct
 
 	TIMER_CAPT_COMP_OUTPOL_t	CCER_CaptComp1OutPol;
 	TIMER_ENABLE_DISABLE_t		CCER_CaptComp1OutEnable;
-} TimerBasic_Drv_Regs_t;
+} Timer_Drv_Regs_t;
 
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/

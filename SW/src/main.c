@@ -10,6 +10,8 @@
 
 #include "Gpio_Drv.h"
 #include "Gpio_Cfg.h"
+#include "Adc_Drv.h"
+#include "Dma_Drv.h"
 #include "Usart_Drv.h"
 #include "AcquireInput.h"
 
@@ -31,8 +33,8 @@ int main(void)
 	CRC_Drv_Init();
 	
 	/* Timer initialization */
-	Timer_Drv_Init(TIMERBASIC_7);
-	Timer_Drv_Int(TIMERBASIC_7);
+	Timer_Drv_Init(TIMERBASIC_7_DELAYUS);
+	Timer_Drv_Int(TIMERBASIC_7_DELAYUS);
 	
 	/* Rtc initialization */
 	RTC_Drv_Init();
@@ -42,6 +44,12 @@ int main(void)
 	
 	/* Gpio Init */
 	Gpio_Drv_Init();
+	
+	/* Dma Init */
+	Dma_Drv_Init(DMA_LIST_ADC_DMA2CH0);
+	
+	/* Adc Init */
+	Adc_Drv_Init(ADC_LIST_1);
 	
 	/* Usart Init */
 	result &= Usart_Drv_Init(USART2_DBG_CMD);
@@ -56,12 +64,29 @@ int main(void)
 	Rtc_Drv_AlarmInt();
 	Clock_Drv_SystickInt();
 	Usart_Drv_Int(USART2_DBG_CMD);
+	Dma_Drv_Int(DMA_LIST_ADC_DMA2CH0);
+	Adc_Drv_Int(ADC_LIST_1);
+	
+	
+	/* Start peripherals */
+	Dma_Drv_Start(DMA_LIST_ADC_DMA2CH0);
+	Adc_Drv_Start(ADC_LIST_1);
+	
+	
+
+	
+		
 
 	
 	
 	
-	
 	/*****************  TEST  **************************************/
+	
+//	Timer_Drv_Init(TIMERBASIC_6_ADC1TRIG);
+//	Timer_Drv_Int(TIMERBASIC_6_ADC1TRIG);
+//	Timer_Drv_Start(TIMERBASIC_6_ADC1TRIG);
+
+	
 	Gpio_Drv_SetPin(LED_BLUE_PORT, LED_BLUE_PIN, HIGH);
 	Gpio_Drv_SetPin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
 	
@@ -84,7 +109,7 @@ int main(void)
 
 	
 	while(1)
-	{	
+	{
 		if (ERROR == result)
 		{
 			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
@@ -107,7 +132,7 @@ int main(void)
 	
 	- read Ultrasonic sensors (input capture?)
 	
-	- accelerometer (SPI, I2C with DMA?) (use HW CRC)
+	- accelerometer (SPI, I2C with DMA?)
 	
 	- usb OTG ?
 	- ethernet?

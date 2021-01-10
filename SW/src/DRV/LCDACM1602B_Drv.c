@@ -7,7 +7,8 @@
 #include "LCDACM1602B_Drv.h"
 #include "LCDACM1602B_Cfg.h"
 #include "Gpio_Drv.h"
-#include "Timer_Cfg.h"
+#include "Clock_Drv.h"
+#include "Timer_Drv.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -64,7 +65,7 @@ void LCDACM1602B_Drv_Init (void)
 	// according to datasheet, we need at least 40ms after power rises above 2.7V
   // before sending commands. Arduino can turn on way before 4.5V so we'll wait 50
 	Delay_us(50000UL);
-		
+	
 	Gpio_Drv_SetPin(LCDACM1602B_E_PORT, LCDACM1602B_E_PIN, LOW);
 	Gpio_Drv_SetPin(LCDACM1602B_RS_PORT, LCDACM1602B_RS_PIN, LOW);
 	

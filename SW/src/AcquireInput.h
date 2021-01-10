@@ -10,6 +10,22 @@
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* TYPE definition */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+typedef enum
+{
+	SONICSENSOR_STATE_INIT = 0U,
+	SONICSENSOR_STATE_LAUNCHTRIGGER,
+	SONICSENSOR_STATE_MEASURE
+} SONICSENSOR_STATE_t;
+
+struct SONICSENSOR_OBJ_t
+{
+	SONICSENSOR_STATE_t 	state;
+	uint32_t 							start_time;
+	uint8_t								rising_falling_state;
+	uint16_t							rising_falling_measure[2];
+	int32_t								pulse_width;
+	uint16_t							distance;		/*[cm]*/
+};
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -30,10 +46,15 @@
 /**************************************************************************************/
 void AcquireInput (void);
 
+/**************************************************************************************/
+/* Acquire_SonicSensor */
+/**************************************************************************************/
+void Acquire_SonicSensor (void);
+
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* EXTERN VARIABLES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-
+extern struct SONICSENSOR_OBJ_t SonicSensor_Obj;
 
 #endif /* __ACQUIREINPUT_H */

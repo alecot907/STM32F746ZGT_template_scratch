@@ -4,7 +4,7 @@
 #include "stm32f7xx.h"
 #include "Usart_Drv.h"
 #include "Usart_Cfg.h"
-#include "Usart.h"
+#include "SerialMonitor.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -37,8 +37,8 @@ const Usart_Drv_Regs_t Usart_Drv_Regs[USART_LIST_TOTAL] =
 		
 		USART_MSBFIRST_LSB,
 		USART_DATAINV_STANDARD,
-		USART_DATAINV_INVERTED,
-		USART_DATAINV_INVERTED,
+		USART_DATAINV_STANDARD,
+		USART_DATAINV_STANDARD,
 		USART_DATAINV_STANDARD,
 		USART_STOPBITS_1,
 		USART_DISABLED,

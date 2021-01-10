@@ -5,18 +5,17 @@
 #include "Clock_Drv.h"
 #include "CRC_Drv.h"
 #include "Timer_Drv.h"
-#include "Timer_Cfg.h"
 #include "Rtc_Drv.h"
 
 #include "Gpio_Drv.h"
-#include "Gpio_Cfg.h"
 #include "Adc_Drv.h"
 #include "Dma_Drv.h"
 #include "Usart_Drv.h"
 #include "AcquireInput.h"
 
-#include "LCDACM1602B.h"
-#include "Rtc.h"
+#include "Sveglia.h"
+#include "Display.h"
+#include "SerialMonitor.h"
 
 
 int main(void)
@@ -28,16 +27,23 @@ int main(void)
 	
 	/* Clock initialization */
 	result &= Clock_Drv_Init();	
-	
+		
 	/* CRC initialization */
 	CRC_Drv_Init();
 	
 	/* Timer initialization */
-	Timer_Drv_Init(TIMERBASIC_7_DELAYUS);
-	Timer_Drv_Int(TIMERBASIC_7_DELAYUS);
-	
+	Timer_Drv_Init(TIMERBASIC_7_DELAY);
+	Timer_Drv_Int(TIMERBASIC_7_DELAY);
+
 	Timer_Drv_Init(TIMERBASIC_6_ADC1TRIG);
 
+	Timer_Drv_Init(TIMERGENERAL_14_PWM);
+	
+	Timer_Drv_Init(TIMERGENERAL_11_SONICTRIG);
+	
+	Timer_Drv_Init(TIMERGENERAL_13_SONICECHO);
+	Timer_Drv_Int(TIMERGENERAL_13_SONICECHO);
+	
 	/* Rtc initialization */
 	RTC_Drv_Init();
 	
@@ -59,9 +65,6 @@ int main(void)
 	/* LCD Init */
 	LCDACM1602B_Drv_Init();
 
-	/* PWM init */
-	Timer_Drv_Init(TIMEGENERAL_14_PWM);
-
 	/* Interrupt Init */
 	Rtc_Drv_AlarmInt();
 	Clock_Drv_SystickInt();
@@ -77,14 +80,21 @@ int main(void)
 	
 	
 	
-	
-	
-	
-	
 	/*****************  TEST  **************************************/
-		
 	Gpio_Drv_SetPin(LED_BLUE_PORT, LED_BLUE_PIN, HIGH);
-	Gpio_Drv_SetPin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
+	
+	
+//	static uint64_t starttime,
+//									endtime,
+//									elapsedtime, elapsedtime2;
+//	starttime = GetTime_us();
+//	Delay_us(25000U);
+//	Delay_us(25000U);
+//	Delay_us(25000U);
+//	Delay_us(25000U);
+//	endtime = GetTime_us();
+//	elapsedtime = endtime - starttime;
+	
 	
 //	RTC_Drv_AlarmConfigure(&RTC_AlarmTime);
 //	RTC_Drv_AlarmEnable();
@@ -105,19 +115,22 @@ int main(void)
 
 
 
-	
 	while(1)
 	{
 		if (ERROR == result)
 		{
 			Gpio_Drv_SetPin(LED_RED_PORT, LED_RED_PIN, HIGH);
 		}
+				
+		/* AcquireInput managed in the interrupt handling of DMA (AcquireInput() function) */
+				
+		Acquire_SonicSensor();
+				
+		Sveglia_Mng();
 		
-		/* AcquireInput managed in the interrupt handling of DMA */
+		Display_Mng();
 		
-		Rtc_Mng();
-		
-		LCDACM1602B_Mng();
+		SerialMonitor_Mng();
 	}
 	
 	return 0;
@@ -125,9 +138,7 @@ int main(void)
 
 
 
-	/* NEXT STEPS:	
-	- read Ultrasonic sensors (input capture?)
-	
+	/* NEXT STEPS:		
 	- accelerometer (SPI, I2C with DMA?)
 	
 	- usb OTG ?
@@ -135,3 +146,5 @@ int main(void)
 	- low power management
 	- hdmi?
 	- hash processor? */
+
+

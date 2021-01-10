@@ -393,24 +393,24 @@
               <FilePath>.\src\SysData.c</FilePath>
             </File>
             <File>
-              <FileName>Usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\Usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>Rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\Rtc.c</FilePath>
-            </File>
-            <File>
               <FileName>AcquireInput.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\AcquireInput.c</FilePath>
             </File>
             <File>
-              <FileName>LCDACM1602B.c</FileName>
+              <FileName>Sveglia.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\LCDACM1602B.c</FilePath>
+              <FilePath>.\src\Sveglia.c</FilePath>
+            </File>
+            <File>
+              <FileName>Display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\Display.c</FilePath>
+            </File>
+            <File>
+              <FileName>SerialMonitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\SerialMonitor.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -491,6 +491,16 @@
               <FileName>Dma_Drv.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\DRV\STM32F746ZG\Dma_Drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>Spi_Cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Spi_Cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>Spi_Drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\DRV\STM32F746ZG\Spi_Drv.c</FilePath>
             </File>
           </Files>
         </Group>

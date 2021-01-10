@@ -2,7 +2,6 @@
 /* DEPENDENCIES */
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 #include "Clock_Drv.h"
-#include "Clock_Cfg.h"
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /* DEFINES */
@@ -151,10 +150,11 @@ void Clock_Drv_SystickInt(void)
   NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), SYS_TICK_PRIORITY, SYS_TICK_SUBPRIORITY));
 }
 
+
+#ifndef OS_USE
 /**************************************************************************************/
 /* SysTick_Handler */
 /**************************************************************************************/
-#ifndef OS_USE
 void SysTick_Handler(void)
 {
 	sys_ticks++;
@@ -172,3 +172,6 @@ void Delay_ms (uint32_t	delay_ms)
 	while( (sys_ticks - TimeInit) < delay_ms);
 }
 #endif
+
+
+
